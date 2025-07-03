@@ -8,5 +8,8 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
     ]
-  }
+  },
+  modules: [
+    'nuxt-mongoose',
+  ],
 })
