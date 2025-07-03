@@ -1,31 +1,26 @@
+ARG NODE_VERSION=18.19.1
 
+FROM node:${NODE_VERSION}-slim as base
 
-FROM node:22-alpine AS build
-WORKDIR /app
+ARG PORT=3000
 
-RUN corepack enable
+WORKDIR /src
 
+FROM base as build
 
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY --link package.json package-lock.json .
+RUN npm install
 
-RUN pnpm i
+COPY --link . .
 
+RUN npm run build
 
-COPY . ./
+FROM base
 
+ENV PORT=$PORT
+ENV NODE_ENV=production
+ENV MONGODB_URI=mongodb+srv://zellendev:johnuserpass22!@synersyllo.8jeq7ma.mongodb.net/?retryWrites=true&w=majority&appName=SynerSyllo
 
-RUN pnpm run build
+COPY --from=build /src/.output /src/.output
 
-
-
-FROM node:22-alpine
-WORKDIR /app
-
-COPY --from=build /app/.output/ ./
-
-ENV PORT=6060
-ENV HOST=0.0.0.0
-
-EXPOSE 6060
-
-CMD ["node", "/app/server/index.mjs"]
+CMD [ "node", ".output/server/index.mjs" ]
