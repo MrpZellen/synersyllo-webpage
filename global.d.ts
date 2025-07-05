@@ -8,5 +8,8 @@ namespace NodeJS {
         USERCOLLECTION: string,
         COMPANYCOLLECTION: string,
         GROUPCOLLECTION: string,
+        OAUTHID: string,
+        OAUTHSECRET: string,
+        REDIRECT: string,
     }
 }

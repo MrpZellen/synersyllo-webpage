@@ -8,7 +8,7 @@ WORKDIR /src
 
 FROM base as build
 
-COPY --link package.json package-lock.json .
+COPY --link package.json package-lock.json ./
 RUN npm install
 
 COPY --link . .

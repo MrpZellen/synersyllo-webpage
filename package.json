@@ -12,6 +12,7 @@
   "dependencies": {
     "@oxc-parser/binding-linux-x64-gnu": "^0.75.0",
     "@tailwindcss/vite": "^4.1.11",
+    "googleapis": "^150.0.1",
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.1",
     "nuxt": "^3.17.6",
