@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+@theme {
+    --color-synsyl-darkgreen: #4a7c59ff;
+    --color-synsyl-lightgreen: #000000ff;
+    --color-synsyl-lightblue: #68b0abff;
+    --color-synsyl-nilbog: #c8d5b9ff;
+    --color-synsyl-sandy: #faf3ddff;
+}
