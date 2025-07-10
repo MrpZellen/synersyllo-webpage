@@ -30,12 +30,12 @@ export default defineEventHandler(async (event) => {
   const calendars = response?.data.items || [];
     console.log(calendars);
     return {
-      calendars,
+      result: calendars[0],
       status: 200
     };
 } catch (error) {
     return {
-      calendars: null,
+      result: null,
       status: 400
     }
 }

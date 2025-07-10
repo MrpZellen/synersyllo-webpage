@@ -30,15 +30,15 @@ export default defineEventHandler(async (event) => {
         }
       });
     });
-  const calendars = response?.data.items || [];
-    console.log(calendars);
+  const events = response?.data.items || [];
+    console.log(events);
     return {
-      calendars,
+      events: events,
       status: 200
     };
 } catch (error) {
     return {
-      calendars: null,
+      events: null,
       status: 400
     }
 }
