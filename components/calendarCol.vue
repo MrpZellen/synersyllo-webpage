@@ -1,66 +1,118 @@
 <template>
   <div class="flex flex-col w-full h-full text-center border-2 border-black">
     <div class=" top-0 border-2 border-black">
-    {{ dayItem }}
+    {{ dayTitle }}, (DATE HERE)
   </div>
     <div class="flex-1 relative items-stretch justify-items-stretch">
-      <div v-for="event in eventList">
-        <calendar-event :event-title="event.title" :event-count="dayCount" :hour="event.hour" :chunk="event.chunk"></calendar-event>
+      <div v-for="(event, index) in eventList" :key="index">
+        <calendar-event @open-menu="handleChildData" :hours-shown="24" :event-title="event.title" :event-desc="event.desc" :event-count="dayCount" :hour="event.hour" :chunk="event.chunk"></calendar-event>
       </div>
-      <calendar-event :event-title="eventTitles[0]" :event-count="dayCount" :hour="1" :chunk="1"></calendar-event>
-      <calendar-event :event-title="eventTitles[1]" :event-count="dayCount" :hour="2" :chunk="0.5"></calendar-event>
-      <calendar-event :event-title="eventTitles[2]" :event-count="dayCount" :hour="3" :chunk="0.25"></calendar-event>
-      <calendar-event :event-title="eventTitles[3]" :event-count="dayCount" :hour="5" :chunk="2"></calendar-event>
-      <calendar-event :event-title="eventTitles[4]" :event-count="dayCount" :hour="6" :chunk="1.5"></calendar-event>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import CalendarEvent from './calendarEvent.vue';
+import type { CalendarEvent } from '~/models/CalendarEvent';
+
+ const emitResult = defineEmits(['sendToBack'])
  const props = defineProps<{
   day: number,
   dayCount: number,
-  eventInfo: typeof CalendarEvent[],
  }>();
- //date calculation
- var currentTime = new Date().toDateString()
- var dayItem = currentTime.substring(0, 2).toUpperCase();
 
- var eventList = new Array();
+ //date calculation
+ const page = 1;
+ const dateCall = (num: number) => {
+  var dayItem = 'WHA'
+  switch (num) {
+  case 0:
+    dayItem = 'SUN'
+    break;
+  case 1:
+    dayItem = 'MON'
+    break;
+  case 2:
+    dayItem = 'TUE'
+    break;
+  case 3:
+    dayItem = 'WED'
+    break;
+  case 4:
+    dayItem = 'THU'
+    break;
+  case 5:
+    dayItem = 'FRI'
+    break;
+  case 6:
+    dayItem = 'SAT'
+    break;
+ }
+ return dayItem
+ }
+ var currentDay = new Date()
+ var dayTitle = dateCall(props.day)
+ const getDateRelation = () => {
+  var day = currentDay.getDay()
+  var currentMD = currentDay.toDateString()
+  var currentDayNum = parseInt(currentMD.substring(8, 10))
+  var currentMonNum = currentMD.substring(4, 7)
+  var currentYearNum = parseInt(currentMD.substring(11))
+ }
+ //var shownDate;
+ //week and extra calendar support for future
+
+ //handling child data
+ const handleChildData = (payload: object) => {
+   emitResult('sendToBack', payload)
+   console.log(payload)
+ }
+
+ //handling event API info
+  var eventInfo: CalendarEvent[];
+  const getEventInfo = async () => {
+    const result = await $fetch<{ events: CalendarEvent[] }>('/api/events', {
+      credentials: 'include'
+    })
+    console.log('OUR RESULT:', result)
+    eventInfo = result.events
+    validateList();
+  }
+
+ const eventList = ref<{title: string, hour: number; chunk: number, desc: string}[]>([])
  const validateList = async () => {
-  props.eventInfo.forEach(element => {
-     var dateString = element.start.dateTime.substring(0, 9);
+  console.log(eventInfo)
+    if(eventInfo != null){
+  eventInfo.forEach(element => {
+     var dateString = element.start.dateTime.substring(0, 10);
+     let date = new Date(dateString)
+     console.log('date string', dateString)
+     console.log('date test', date)
      //num math
      var startNumString = element.start.dateTime.substring(11, 13);
      var endNumString = element.end.dateTime.substring(11, 13);
+     console.log('john test', startNumString, endNumString)
 
-     var startNum = parseFloat(startNumString) + (parseFloat(element.start.dateTime.substring(15,17))/60)
-     var endNum = parseFloat(endNumString) + (parseFloat(element.end.dateTime.substring(15,17))/60)
+     var startNum = parseFloat(startNumString) + (parseFloat(element.start.dateTime.substring(14,16))/60)
+     var endNum = parseFloat(endNumString) + (parseFloat(element.end.dateTime.substring(14,16))/60)
+     console.log('better johns', startNum, endNum)
 
      var elementHour = Math.trunc(startNum) //truncates to a full number
      var elementChunk = endNum - startNum
-
-     let date = new Date(dateString)
      if(date.getDay() == props.day){
       var newItem = {
         title: element.summary,
         hour: elementHour,
         chunk: elementChunk,
+        desc: element.description
       }
-      eventList.concat(newItem)
+      eventList.value.push(newItem)
      }
   });
+    }
  }
- await validateList();
-
- const eventTitles = [
-  'john event',
-  'michael its your bday',
-  'all hands meeting',
-  'no hands meeting',
-  'whose idea was this'
- ]
+ onMounted(() => {
+  getEventInfo()
+})
 </script>
 
 <style>

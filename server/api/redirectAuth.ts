@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
     });
     setCookie(event, 'google_tokens', JSON.stringify(tokens), {
       httpOnly: true,
+      sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -22,8 +23,8 @@ export default defineEventHandler(async (event) => {
 
     oauthClient.setCredentials(tokens); 
     console.log('successful login')
-    setResponseStatus(event, 302);
-    setHeader(event, 'Location', 'http://localhost:3000/calendar');
+    console.log(getCookie(event, 'google_tokens'))
+    sendRedirect(event, '/calendar')
     return;
 
   } catch (error) {

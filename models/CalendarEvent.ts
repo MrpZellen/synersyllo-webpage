@@ -1,6 +1,6 @@
 
 //I HAD CHATGPT CONVERT THE DATA STRUCTURE OF A GOOGLE CALENDAR API EVENT INTO THIS SO I WOULDNT HAVE TO MANUALLY TYPE IT.
-interface CalendarEvent {
+export interface CalendarEvent {
   kind: string;
   etag: string;
   id: string;

@@ -18,8 +18,7 @@ export default defineEventHandler(async (event) => {
   const response = await new Promise((resolve, reject) => {
       calendar.events.list({
         calendarId:'primary',
-        timeMin:(new Date()).toISOString(),
-        maxResults:15,
+        maxResults:100,
         singleEvents:true,
         orderBy:'startTime'
       }, (err, res) => {
@@ -31,12 +30,13 @@ export default defineEventHandler(async (event) => {
       });
     });
   const events = response?.data.items || [];
-    console.log(events);
+    console.log('THE EVENTS');
     return {
       events: events,
       status: 200
     };
 } catch (error) {
+  console.log('WHATWENTWRONG', error)
     return {
       events: null,
       status: 400

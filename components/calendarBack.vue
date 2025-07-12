@@ -1,37 +1,41 @@
 <template>
-  <div class="flex w-full min-h-dvh justify-center w-100 border-2 border-black p-2">
-    <div v-if="daysPerWeek == 5" class="grid grid-cols-5 gap-4 w-full min-h-full">
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="1" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="2" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="3" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="4" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="5" :event-info="eventInfo" />
+  <div v-if="!props.isInBG" class="flex w-full min-h-dvh justify-center w-100 border-2 border-black p-2">
+    <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
+      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index"/>
     </div>
-    <div v-else class="grid grid-cols-7 gap-2 w-full min-h-full">
-      <calendar-col :day-count="daysPerWeek"class="h-full" :day="0" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="1" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="2" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="3" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="4" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="5" :event-info="eventInfo" />
-      <calendar-col :day-count="daysPerWeek" class="h-full" :day="6" :event-info="eventInfo" />
+  </div>
+  <div v-else>
+    <div class="flex w-full min-h-dvh justify-center w-100 border-2 border-black p-2 blur-xs">
+    <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
+      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index"/>
     </div>
+  </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+
   const props = defineProps<{
     titleOfCalendar: string,
     themeColor: string,
     userEmail: string,
-    daysPerWeek: number
+    daysPerWeek: number,
+    isInBG: boolean
   }>();
-  var eventInfo: any;
-  const getEventInfo = async () => {
-    const result = await $fetch('/api/events')
-    eventInfo.results = result
+  var dayCounted: number[] = []
+  if(props.daysPerWeek == 5){
+    dayCounted = [1, 2, 3, 4, 5]
+  } else {
+    dayCounted = [0, 1, 2, 3, 4, 5, 6]
   }
-  getEventInfo()
+  const emitToMain = defineEmits(['emitFinal'])
+  const isInBG = ref(props.isInBG)
+  const retrieveBackData = (payload: any) => {
+    isInBG.value = true
+    emitToMain('emitFinal', payload)
+    console.log('emitted full!')
+  }
+
 </script>
 
 <style>
