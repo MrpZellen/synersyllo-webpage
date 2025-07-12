@@ -23,6 +23,8 @@ export default defineEventHandler(async (event) => {
 
     oauthClient.setCredentials(tokens); 
     console.log('successful login')
+    const tokenInfo = await oauthClient.getTokenInfo(tokens.access_token);
+    console.log(tokenInfo.scopes);
     console.log(getCookie(event, 'google_tokens'))
     sendRedirect(event, '/calendar')
     return;

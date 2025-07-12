@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     ]
   },
   modules: [
-    'nuxt-mongoose',
+    'nuxt-mongoose'
   ],
   runtimeConfig: {
     OAUTHID: process.env.NUXT_OAUTHID,
