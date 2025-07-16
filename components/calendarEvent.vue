@@ -34,6 +34,7 @@
 
   const optionMenu = () => {
     var resultItem = {
+      eventID: props.id,
       eventTitle: props.eventTitle,
       eventDesc: props.eventDesc,
       startHour: props.hour,
@@ -41,10 +42,11 @@
     }
     emitresult('open-menu', resultItem)
   }
-  const thresholdTime = 1
+  const thresholdTime = 1.5
   const props = defineProps({
     chunk: Number,
     hour: Number,
+    id: String,
     eventCount: Number,
     eventTitle: String,
     eventDesc: String,

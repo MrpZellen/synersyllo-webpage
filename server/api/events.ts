@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
   const tokens = JSON.parse(cookie);
   oauthClient.setCredentials(tokens);
   const calendar = google.calendar({version:'v3', auth:oauthClient})
+  const startDate = new Date().toDateString()
   try{
   const response = await new Promise((resolve, reject) => {
       calendar.events.list({
@@ -30,7 +31,6 @@ export default defineEventHandler(async (event) => {
       });
     });
   const events = response?.data.items || [];
-    console.log('THE EVENTS');
     return {
       events: events,
       status: 200

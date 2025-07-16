@@ -1,13 +1,13 @@
 <template>
   <div v-if="!props.isInBG" class="flex w-full min-h-dvh justify-center w-100 border-2 border-black p-2">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index"/>
+      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
     </div>
   </div>
   <div v-else>
     <div class="flex w-full min-h-dvh justify-center w-100 border-2 border-black p-2 blur-xs">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index"/>
+      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
     </div>
   </div>
   </div>
@@ -16,6 +16,7 @@
 <script lang="ts" setup>
 
   const props = defineProps<{
+    recall: boolean,
     titleOfCalendar: string,
     themeColor: string,
     userEmail: string,

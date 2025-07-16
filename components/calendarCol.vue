@@ -5,7 +5,7 @@
   </div>
     <div class="flex-1 relative items-stretch justify-items-stretch">
       <div v-for="(event, index) in eventList" :key="index">
-        <calendar-event @open-menu="handleChildData" :hours-shown="24" :event-title="event.title" :event-desc="event.desc" :event-count="dayCount" :hour="event.hour" :chunk="event.chunk"></calendar-event>
+        <calendar-event @open-menu="handleChildData" :hours-shown="24" :event-title="event.title" :id="event.id" :event-desc="event.desc" :event-count="dayCount" :hour="event.hour" :chunk="event.chunk"></calendar-event>
       </div>
     </div>
   </div>
@@ -14,11 +14,15 @@
 <script lang="ts" setup>
 import type { CalendarEvent } from '~/models/CalendarEvent';
 
+
  const emitResult = defineEmits(['sendToBack'])
  const props = defineProps<{
+  recall: boolean
   day: number,
   dayCount: number,
  }>();
+
+const recall = ref(props.recall)
 
  //date calculation
  const page = 1;
@@ -76,9 +80,10 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
     console.log('OUR RESULT:', result)
     eventInfo = result.events
     validateList();
+    recall.value = true
   }
 
- const eventList = ref<{title: string, hour: number; chunk: number, desc: string}[]>([])
+ const eventList = ref<{id: string, title: string, hour: number; chunk: number, desc: string}[]>([])
  const validateList = async () => {
   console.log(eventInfo)
     if(eventInfo != null){
@@ -100,6 +105,7 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
      var elementChunk = endNum - startNum
      if(date.getDay() == props.day){
       var newItem = {
+        id: element.id,
         title: element.summary,
         hour: elementHour,
         chunk: elementChunk,
@@ -111,7 +117,7 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
     }
  }
  onMounted(() => {
-  getEventInfo()
+    getEventInfo()
 })
 </script>
 

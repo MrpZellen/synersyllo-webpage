@@ -3,7 +3,7 @@ import {google} from 'googleapis';
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   console.log('hit')
-  const oauthClient = new google.auth.OAuth2('431685922807-87m61aqc8qliu36erdppeuat8ir0unqc.apps.googleusercontent.com', config.OAUTHSECRET, config.REDIRECT)
+  const oauthClient = new google.auth.OAuth2(config.OAUTHID, config.OAUTHSECRET, config.REDIRECT)
   const code = getQuery(event).code
   console.log(code)
   try {

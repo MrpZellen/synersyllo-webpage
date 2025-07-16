@@ -18,5 +18,6 @@ export default defineEventHandler(async (event) => {
     access_type:'offline',
     scope:['https://www.googleapis.com/auth/calendar'],
   })
+  console.log("Login URL", url)
   sendRedirect(event, url)
 })

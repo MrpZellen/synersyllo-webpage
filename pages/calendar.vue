@@ -10,7 +10,7 @@
   <div class="w-full">
     <div
       v-if="openAddWindow == true"
-      class="absolute z-50 p-5 top-1/3 left-1/3 w-[400px] h-[350px] rounded-sm bg-blue-300 border-2 border-black shadow-lg"
+      class="absolute z-50 p-5 top-1/3 left-1/3 w-[400px] h-[500px] rounded-sm bg-blue-300 border-2 border-black shadow-lg"
      >
      <div v-if="!goodFields" class="text-red-500 text-md font-bold">please input all fields!</div>
       <div class="text-xl p-2">
@@ -33,6 +33,26 @@
           <input type="datetime-local" v-model="popOutValues.endHour" />
         </div>
       </div>
+      <div class="text-md p-2 flex flex-col">
+        <div>Is It Recurring?
+          <input type="checkbox" v-model="popOutValues.isRecurring"/>
+          <div class="flex flex-col" v-if="popOutValues.isRecurring">
+            <div>What interval?
+              Daily <input type="radio" name="recurring" value="daily" v-model="repetitionValues.interval" />
+              Weekly <input type="radio" name="recurring" value="weekly" v-model="repetitionValues.interval" />
+              Biweekly <input type="radio" name="recurring" value="biweekly" v-model="repetitionValues.interval" />
+              Monthly <input type="radio" name="recurring" value="monthly" v-model="repetitionValues.interval" />
+              Yearly <input type="radio" name="recurring" value="yearly" v-model="repetitionValues.interval" />
+            </div>
+            <div>When should it end?
+              Never <input type="checkbox" value="never" v-model="repetitionValues.endsOn" v-on:click="showEndMenu" />
+              <div v-if="ends">
+                <input type="datetime-local" v-model="repetitionValues.endsOn" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <button
             @click="backNew"
             class="m-1 px-4 py-2 bg-sky-100 rounded hover:bg-sky-300 hover:border-black border-2 border-transparent font-bold"
@@ -51,8 +71,8 @@
         class="absolute z-50 p-5 top-1/3 left-1/3 w-[400px] h-[250px] rounded-sm bg-blue-300 border-2 border-black shadow-lg"
       >
         <div class="text-xl font-bold p-2">{{ popOutValues!.eventTitle }}</div>
-        <div class="text-lg bg-white rounded-sm p-2">
-          {{ popOutValues!.eventDesc }}
+        <div class="text-sm bg-white rounded-sm p-2">
+          {{ popOutValues!.eventDesc ?? 'No Description...' }}
         </div>
         <div class="text-md flex justify-end p-1 text-end">
           {{ startHourCalc }} - {{ endHourCalc }}
@@ -73,19 +93,24 @@
         </div>
       </div>
     </div>
-    <calendar-back
-      @emit-final="retrieveBackData"
-      :isInBG="isInBG"
-      :title-of-calendar="items.titleOfCalendar"
-      :theme-color="items.themeColor"
-      :user-email="items.userEmail"
-      :days-per-week="7"
-    />
+    <keep-alive>
+      <calendar-back
+        @emit-final="retrieveBackData"
+        :recall="menuClosed"
+        :isInBG="isInBG"
+        :title-of-calendar="items.titleOfCalendar"
+        :theme-color="items.themeColor"
+        :user-email="items.userEmail"
+        :days-per-week="7"
+      />
+    </keep-alive>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as z from 'zod';
+import type { Calendar } from '~/models/Calendar'
+const menuClosed = ref(true)
 const checkValues = z.object({
   eventTitle: z.string(),
   eventDesc: z.string(),
@@ -105,6 +130,10 @@ const getCalendar = () => {
 const getEvent = () => {
   navigateTo("/api/events");
 };
+const ends = ref(true)
+const showEndMenu = () => {
+  ends.value = !ends.value
+}
 //NEW CONCEPT: a reactive allows it to be changed post build
 const items = reactive({
   titleOfCalendar: "",
@@ -112,17 +141,28 @@ const items = reactive({
   userEmail: "",
   daysPerWeek: 7,
 });
+const repetitionValues = ref<{
+  interval: string,
+  endsOn: string,
+}>({
+  interval: '',
+  endsOn: '',
+});
 
 const popOutValues = ref<{
-  eventTitle: '',
-  eventDesc: '',
-  startHour: 0,
-  endHour: 0,
+  eventID: string,
+  eventTitle: string,
+  eventDesc: string,
+  startHour: number,
+  endHour: number,
+  isRecurring: boolean
 }>({
+  eventID: '',
   eventTitle: '',
   eventDesc: '',
   startHour: 0,
   endHour: 0,
+  isRecurring: false
 });
 var startHourCalc = "0 PM";
 var endHourCalc = "1 PM";
@@ -155,23 +195,24 @@ const calcResult = (hour: number) => {
 };
 
 const buildCalendar = async () => {
-  const result = await $fetch<{
-    id: string;
-    summary: string;
-    description?: string;
-    backgroundColor: string;
-  }>("/api/calendars");
-  items.titleOfCalendar = result.summary;
-  items.themeColor = result.backgroundColor;
-  items.userEmail = result.id;
-  items.daysPerWeek = 7;
+
+  const result = await $fetch<{ calendars: Calendar }>('/api/getCalendar', {
+    credentials: 'include'
+  }).then((result) => {
+    items.titleOfCalendar = result.calendars.summary;
+    items.themeColor = result.calendars.backgroundColor;
+    items.userEmail = result.calendars.id;
+    items.daysPerWeek = 7;
+    console.log('ITEMS HERE!!!!  ', result)
+  })
 };
-buildCalendar();
 
 const back = () => {
+  menuClosed.value = false
   isInBG.value = false;
 };
 const backNew = () => {
+  menuClosed.value = false;
   openAddWindow.value = false;
 }
 
@@ -184,6 +225,11 @@ const addEvent = async () => {
     startHour: popOutValues.value.startHour,
     endHour: popOutValues.value.endHour,
   })
+  if(popOutValues.value.isRecurring){
+    if(repetitionValues.value.endsOn === ''){
+      repetitionValues.value.endsOn = 'never'
+    }
+  }
   //then post it:
   const response = await $fetch('/api/addEvent', {
     method: 'POST',
@@ -195,9 +241,14 @@ const addEvent = async () => {
       eventDesc: popOutValues.value.eventDesc,
       startHour: popOutValues.value.startHour,
       endHour: popOutValues.value.endHour,
+      status: 'confirmed',
+      recurrence: popOutValues.value.isRecurring,
+      recurrenceItems: {
+        endsOn: repetitionValues.value.endsOn ?? 'never',
+        interval: repetitionValues.value.interval ?? null
+      },
     })
   }).then(() => {
-    console.log(response)
     backNew()
   })
   } catch(error) {
@@ -206,4 +257,29 @@ const addEvent = async () => {
 };
 
 //REMOVE EVENT
+const removeEvent = async () => {
+  try{
+  //then post it:
+  const response = await $fetch('/api/deleteEvent', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      eventID: popOutValues.value.eventID,
+      calendarID: 'work@benleonard.net' //todo: get user info from mongodb
+    })
+  }).then(() => {
+    console.log(response)
+    back()
+  })
+  } catch(error) {
+    console.log(error)
+    back()
+  }
+};
+
+onMounted(async () => {
+  await buildCalendar();
+})
 </script>

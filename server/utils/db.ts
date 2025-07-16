@@ -4,10 +4,9 @@ let connect = false
 
 export default async function connectDB() {
   if (connect) return
-
   try {
-    await mongoose.connect(process.env.MONGODB_URI!, {
-      dbName: process.env.DBNAME,
+    await mongoose.createConnection('mongodb://localhost:8081', {
+      dbName: 'company_storage',
     })
     connect = true
     console.log('success')
