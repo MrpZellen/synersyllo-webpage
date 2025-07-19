@@ -1,15 +1,11 @@
 import mongoose from 'mongoose'
 
-let connect = false
 
 export default async function connectDB() {
-  if (connect) return
+  if (mongoose.connection.readyState === 1) return
   try {
-    await mongoose.createConnection('mongodb://localhost:8081', {
-      dbName: 'company_storage',
-    })
-    connect = true
-    console.log('success')
+    await mongoose.connect('mongodb://zellendev:adminDev@localhost:27017/company_storage')
+    console.log('success')  
   } catch (err) {
     console.error('connection was wrong: ', err)
     throw err

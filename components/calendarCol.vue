@@ -96,7 +96,6 @@ const recall = ref(props.recall)
      var startNumString = element.start.dateTime.substring(11, 13);
      var endNumString = element.end.dateTime.substring(11, 13);
      console.log('john test', startNumString, endNumString)
-
      var startNum = parseFloat(startNumString) + (parseFloat(element.start.dateTime.substring(14,16))/60)
      var endNum = parseFloat(endNumString) + (parseFloat(element.end.dateTime.substring(14,16))/60)
      console.log('better johns', startNum, endNum)

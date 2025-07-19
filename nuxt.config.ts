@@ -4,6 +4,11 @@ import google from 'googleapis';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
+  app: {
+    head: {
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    },
+  },
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   vite: {
