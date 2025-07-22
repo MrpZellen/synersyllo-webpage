@@ -10,8 +10,6 @@ import 'survey-core/survey-core.css';
 import { Model } from 'survey-core';
 import { generateRandomID } from '~/server/utils/stringGenerator';
 import { industryDropdownChoices } from '~/models/choices';
-import Company from '~/models/Company';
-import type { ComparisonExpressionOperator } from 'mongoose';
 
 const surveyModel = {
   pages: [{
@@ -104,26 +102,36 @@ const surveyModel = {
     ]
   }]
 }
-const survey = new Model(surveyModel)
 
-//NOW WE MOVE THE DATA:
-const SURVEY_ID = 1
-var results = new Company()
-
-const surveyComplete = async (survey: any) => {
+const surveyComplete = (survey: any) => {
+  console.log('hi, we did surveys')
   const companyID = 'COM-' + generateRandomID(9)
+  console.log('generatedNum')
   survey.setValue("companyID", companyID);
-  results = defineSurveySchema(survey)
+  console.log('value set')
+  const results = defineSurveySchema(survey)
+  console.log('schema defined')
 
   //call api to save company scheme
-  const companyReturn = await $fetch('/api/company/createCompany', {
+  companyReturn(JSON.parse(JSON.stringify(results)))
+}
+
+const survey = new Model(surveyModel)
+survey.onComplete.add(surveyComplete)
+
+//NOW WE MOVE THE DATA:
+const SURVEY_ID = 1 
+
+const companyReturn = async (results: any) => { 
+  console.log('we go')
+  const result = await $fetch('/api/company/createCompany', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(results)
   });
-  if(companyReturn){
+  if(result){
     console.log("success! Company Added")
     //do stuff when company added, redirect and guide to main user login.
   } else {
@@ -132,35 +140,45 @@ const surveyComplete = async (survey: any) => {
 }
 
 const defineSurveySchema = (survey: any) => {
-  const finalCompany = new Company({
-    companyID: survey.getQuestionByName("companyID").value,
+  var toneItem, avoidItem, companyItem = []
+  if(survey.data.bobInfo.specifications.tone){
+    toneItem = survey.data.bobInfo.specifications.tone.split(',');
+  }
+  if(survey.data.bobInfo.specifications.avoid){
+    avoidItem = survey.data.bobInfo.specifications.avoid.split(',');
+  }
+  if(survey.data.companyRoles){
+    companyItem = survey.data.companyRoles.split(',');
+  }
+  console.log('lets make the guy')
+  const finalCompany = {
+    companyID: survey.data.companyID,
     companyInfo: {
-      name: survey.getQuestionByName("companyInfo.name").value,
-      industry: survey.getQuestionByName("companyInfo.industry").value,
-      size: survey.getQuestionByName("companyInfo.size").value,
+      name: survey.data.companyInfo.name,
+      industry: survey.data.companyInfo.industry,
+      size: survey.data.companyInfo.size,
       localization: {
-        city: survey.getQuestionByName("companyInfo.localization.city").value,
-        state: survey.getQuestionByName("companyInfo.localization.state").value,
-        postzip: survey.getQuestionByName("companyInfo.localization.postzip").value,
-        timezone: survey.getQuestionByName("companyInfo.localization.timezone").value,
+        city: survey.data.companyInfo.localization.city,
+        state: survey.data.companyInfo.localization.state,
+        postzip: survey.data.companyInfo.localization.postzip,
+        timezone: survey.data.companyInfo.localization.timezone,
       }
     },
     bobInfo: {
       bobInstanceID: 'BOB-' + generateRandomID(9),
       specifications: {
-        tone: survey.getQuestionByName("bobInfo.specifications.tone").value,
-        description: survey.getQuestionByName("bobInfo.specifications.description").value,
-        avoid: survey.getQuestionByName("bobInfo.specifications.avoid").value.replace('\n', ',').split(',')
+        tone: toneItem ?? [],
+        description: survey.data.bobInfo.specifications.description,
+        avoid: avoidItem ?? [],
       }
     },
     adminAccounts: [],
-    website: survey.getQuestionByName("website").value,
-    companyRoles: survey.getQuestionByName("companyRoles").value.split(',')
-  })
+    website: survey.data.website,
+    companyRoles: companyItem ?? []
+  }
+  console.log('guy made')
   return finalCompany
 }
-
-survey.onComplete.add(surveyComplete)
 </script>
 
 <style>

@@ -8,9 +8,7 @@ export default defineEventHandler(async (event) => {
   try { 
     await connectDB();
     console.log('making company')
-    const insertedCompany = new Company({
-
-    })
+    const insertedCompany = new Company(req)
     console.log('company added')
     await insertedCompany.save();
     console.log('company inserted')

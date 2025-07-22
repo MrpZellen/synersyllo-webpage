@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import User from "~/models/User";
 import { getUser, killUser } from '~/server/utils/sessionStorage'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<any> => {
   let req = await readBody(event)
   console.log(req)
   var user = req.userStuff

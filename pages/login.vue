@@ -51,7 +51,7 @@ const submitLogin = async () => {
     });
 
     const validatedUser = UserVal.parse(loginInfo.value)
-    await $fetch('/api/accessUser/login', {
+    const result = await $fetch('/api/accessUser/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

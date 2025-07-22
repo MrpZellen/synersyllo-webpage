@@ -36,6 +36,11 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 3, //3 days
       })
       //now we are authed up
+      return {
+        user: req.username,
+        status: 200,
+        code: 'success'
+      }
     } else {
       //false, return problem
       console.log('bad hash')

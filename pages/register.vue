@@ -18,7 +18,6 @@
 
 <script setup lang="ts">
 import * as z from 'zod';
-import { setUser, getUser } from '~/server/utils/sessionStorage'
 import { v4 as uuidv4 } from 'uuid'
 const failedUser = ref(false)
 const registrationInfo = ref<{
@@ -38,16 +37,10 @@ const submitRegistration = async () => {
     });
 
     const validatedUser = UserVal.parse(registrationInfo.value)
-    //TODO: clean failed cookie handling
-    const trueUser = {
-      signUp: true,
-      signIn: false,
-      userInfo: validatedUser
-    }
     //BUT FIRST, set user:
     const id = uuidv4()
-    await setUser(id, trueUser.userInfo.username)
-    console.log('userstuff:',  getUser(id))
+    const user = await $fetch(`/api/session/${id}`)
+    console.log('userstuff:',  user)
     const clientId = encodeURIComponent('431685922807-kr6tslc5l1if280ht90bqgh8h03m4rmb.apps.googleusercontent.com')
     const redirectUri = encodeURIComponent('http://localhost:3000/api/redirectAuth')
     const scope = [ 'https://www.googleapis.com/auth/calendar',

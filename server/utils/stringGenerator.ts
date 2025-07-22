@@ -6,6 +6,7 @@ export function generateRandomID(length: number) {
   const maxLength = characters.length;
   while(length > 0){
     result += characters.charAt(Math.floor(Math.random() * maxLength))
+    length--
   }
 
   return result
