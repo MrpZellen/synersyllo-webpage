@@ -5,6 +5,8 @@ export default defineEventHandler(async (event) => {
   console.log('hit')
   const oauthClient = new google.auth.OAuth2(config.OAUTHID, config.OAUTHSECRET, config.REDIRECT)
   const code = getQuery(event).code
+  const state = getQuery(event).state
+  console.log('test api state', state)
   console.log(code)
   try {
     const { tokens } = await new Promise<{ tokens: any }>((resolve, reject) => {
@@ -34,40 +36,30 @@ export default defineEventHandler(async (event) => {
     //   personFields: 'emailAddresses,names,'
     // })
     console.log('oopises I stumbled and dropped all this valuable user data: ', yummyUserInformation)
-    var userInOrUp = getCookie(event, 'signupSpecifications');
-    if (!userInOrUp){
-      console.error('somehow you get here! error redirecting, user is not valid on my site')
-      return
-    }
-    const cookieStuff = JSON.parse(userInOrUp)
-    // TODO: authenticate or add user myself
     const userStuff = {
       email: yummyUserInformation.email,
-      username: cookieStuff.userInfo.username,
       userDeets: {
         photo: yummyUserInformation.picture,
         name: yummyUserInformation.name,
         lastName: yummyUserInformation.family_name
       }
     }
-    var ourRequestResult = null
-    if(cookieStuff.signIn){
-      ourRequestResult = null //WIP
-    }else { //register is only other option
-      await $fetch('/api/accessUser/registerUser', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(userStuff)
-    }).then((data) => {
-      if(data){
-        console.log('success')
-      } else {
-        console.error('failed to fetch result, submit failed!')
-      }
+    await $fetch('/api/accessUser/registerUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userStuff: userStuff,
+        authState: state
+      })
+      }).then((data) => {
+        if(data){
+          console.log('success')
+        } else {
+          console.error('failed to fetch result, submit failed!')
+        }
     })
-    }
 
     console.log('successful login')
     const tokenInfo = await oauthClient.getTokenInfo(tokens.access_token);

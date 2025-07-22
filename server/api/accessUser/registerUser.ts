@@ -1,33 +1,27 @@
 import connectDB from "~/server/utils/db";
-import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
 import User from "~/models/User";
-import bcrypt from 'bcryptjs';
+import { getUser, killUser } from '~/server/utils/sessionStorage'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-
   let req = await readBody(event)
   console.log(req)
-  if(!(req.username) || !req.email) {
-    return {
-      status: 400,
-      error: 'you must submit a username!',
-      userTaken: false
-    }
-  }
-  try {
+  var user = req.userStuff
+  try { 
     await connectDB();
+    console.log('whatthejohn: ', req.authState, " ", typeof req.authState)
+    var finalUsername = await getUser(req.authState)
+    console.log('fuser: ', finalUsername)
     await User.deleteOne({ "userInfo.username": "bengerman" });
     console.log('made it past connection')
     const insertedUser = new User({
       userInfo: {
         CID: new ObjectId('686755fecde1ad0903e825a4'),
-        username: req.username,
-        email: req.email,
-        fName: req.userDeets.name,
-        lName: req.userDeets.lastName,
-        profilePhoto: req.userDeets.photo
+        username: finalUsername,
+        email: user.email,
+        fName: user.userDeets.name,
+        lName: user.userDeets.lastName,
+        profilePhoto: user.userDeets.photo
       },
       employeeData: {
         role: 'test',
@@ -36,6 +30,8 @@ export default defineEventHandler(async (event) => {
     console.log('user added')
     await insertedUser.save();
     console.log('user inserted')
+    //now we clear state variable
+    killUser(req.authState)
   } catch (error) {
     console.log('WHATWENTWRONG', error)
       return {

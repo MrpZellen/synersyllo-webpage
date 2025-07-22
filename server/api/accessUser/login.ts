@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         code: 'wrongUserPass'
       }
     }
-    if(await bcrypt.compare(req.password, result?.userInfo?.pass!)){
+    if(await bcrypt.compare(req.password, result?.userInfo?.password!)){
       //if true, return successful login
       setCookie(event, 'userloggedin', JSON.stringify(result!), {
       httpOnly: true,

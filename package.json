@@ -21,6 +21,8 @@
     "node-calendar": "^0.1.5",
     "nuxt": "^3.17.7",
     "nuxt-mongoose": "^1.0.6",
+    "survey-core": "^2.2.5",
+    "survey-vue3-ui": "^2.2.5",
     "tailwindcss": "^4.1.11",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"

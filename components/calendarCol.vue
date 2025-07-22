@@ -74,7 +74,7 @@ const recall = ref(props.recall)
  //handling event API info
   var eventInfo: CalendarEvent[];
   const getEventInfo = async () => {
-    const result = await $fetch<{ events: CalendarEvent[] }>('/api/events', {
+    const result = await $fetch<{ events: CalendarEvent[] }>('/api/events/events', {
       credentials: 'include'
     })
     console.log('OUR RESULT:', result)

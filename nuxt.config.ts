@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   app: {
     head: {
-      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/Logo.ico' }]
     },
   },
   devtools: { enabled: true },
@@ -23,5 +23,17 @@ export default defineNuxtConfig({
     OAUTHID: process.env.NUXT_OAUTHID,
     OAUTHSECRET: process.env.NUXT_OAUTHSECRET,
     REDIRECT: process.env.NUXT_REDIRECT
+  }, //unstorage definitions
+  nitro: {
+    storage: {
+      production: {
+        driver: 'memory'
+      }
+    },
+    devStorage: {
+      production: {
+        driver: 'memory'
+      }
+    }
   }
 })

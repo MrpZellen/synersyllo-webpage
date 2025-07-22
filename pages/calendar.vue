@@ -1,5 +1,5 @@
 <template>
-  <div>Yay! We are authorized!!!</div>
+  <div class="p-2">{{ currentUserInfo }}'s calendar!</div>
   <button
     v-if="isInBG == false"
     @click="openWindow"
@@ -123,13 +123,6 @@ const openWindow = () => {
   openAddWindow.value = true;
   console.log("hit");
 };
-// a little confusing, bgInBG goes back to calendarBack
-const getCalendar = () => {
-  navigateTo("/api/calendars");
-};
-const getEvent = () => {
-  navigateTo("/api/events");
-};
 const ends = ref(true)
 const showEndMenu = () => {
   ends.value = !ends.value
@@ -196,7 +189,7 @@ const calcResult = (hour: number) => {
 
 const buildCalendar = async () => {
 
-  const result = await $fetch<{ calendars: Calendar }>('/api/getCalendar', {
+  const result = await $fetch<{ calendars: Calendar }>('/api/events/getCalendar', {
     credentials: 'include'
   }).then((result) => {
     items.titleOfCalendar = result.calendars.summary;
@@ -231,7 +224,7 @@ const addEvent = async () => {
     }
   }
   //then post it:
-  const response = await $fetch('/api/addEvent', {
+  const response = await $fetch('/api/events/addEvent', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -260,7 +253,7 @@ const addEvent = async () => {
 const removeEvent = async () => {
   try{
   //then post it:
-  const response = await $fetch('/api/deleteEvent', {
+  const response = await $fetch('/api/events/deleteEvent', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

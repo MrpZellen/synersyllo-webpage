@@ -17,13 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import { MongooseError } from 'mongoose';
 import * as z from 'zod';
-
-
-const usernameVal =  z.string().regex(/^.{8,}$/) //at least 8 char
-const failedEmail = ref(false)
-const failedPass = ref(false)
+import { setUser, getUser } from '~/server/utils/sessionStorage'
+import { v4 as uuidv4 } from 'uuid'
 const failedUser = ref(false)
 const registrationInfo = ref<{
   username: string
@@ -42,21 +38,24 @@ const submitRegistration = async () => {
     });
 
     const validatedUser = UserVal.parse(registrationInfo.value)
+    //TODO: clean failed cookie handling
     const trueUser = {
       signUp: true,
       signIn: false,
       userInfo: validatedUser
     }
+    //BUT FIRST, set user:
+    const id = uuidv4()
+    await setUser(id, trueUser.userInfo.username)
+    console.log('userstuff:',  getUser(id))
     const clientId = encodeURIComponent('431685922807-kr6tslc5l1if280ht90bqgh8h03m4rmb.apps.googleusercontent.com')
     const redirectUri = encodeURIComponent('http://localhost:3000/api/redirectAuth')
     const scope = [ 'https://www.googleapis.com/auth/calendar',
             'https://www.googleapis.com/auth/userinfo.email',
             'https://www.googleapis.com/auth/userinfo.profile',
      ].join(' ')
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=${encodeURIComponent(scope)}&response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=${encodeURIComponent(scope)}&response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${id}`
     //goes to auth
-    //first, send req data
-    document.cookie = `authPayload=${JSON.stringify(trueUser)}; path=/; max-age=60; Secure; SameSite=Lax`
     window.location.href = url
     
   } catch (err) {
