@@ -32,7 +32,8 @@ const CompanySchema = new mongoose.Schema({
   companyID: { type: String, required: true },
   bobInfo: { type: BobInfoSchema, required: false },
   adminAccounts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }],
-  website: { type: String, required: false }
+  website: { type: String, required: false },
+  companyRoles: {type: [String], required: true}
 }, { timestamps: true });
 
 export default mongoose.model('Company', CompanySchema);

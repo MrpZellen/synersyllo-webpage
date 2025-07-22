@@ -92,6 +92,16 @@ const surveyModel = {
       description: "List anything BOB should never say or do (comma or line separated)"
     }
    ]
+  }, {
+    title: 'Company Roles',
+    elements: [
+      {
+      name: "companyRoles",
+      title: "What are the roles in your company? (these will start as your groups!)",
+      type: "comment",
+      description: "List any role at your company, separate by commas!"
+    }
+    ]
   }]
 }
 const survey = new Model(surveyModel)
@@ -145,6 +155,7 @@ const defineSurveySchema = (survey: any) => {
     },
     adminAccounts: [],
     website: survey.getQuestionByName("website").value,
+    companyRoles: survey.getQuestionByName("companyRoles").value.split(',')
   })
   return finalCompany
 }
