@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
     console.log('making company')
     const insertedCompany = new Company(req)
     console.log('company added')
+    console.log('Company schema paths:', Company.schema.paths)
     await insertedCompany.save();
     console.log('company inserted')
     return {
