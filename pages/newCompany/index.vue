@@ -16,21 +16,24 @@ const surveyModel = {
     title: 'Company Info',
     elements: [
     {
-      name: "companyInfo.name",
+      name: "companyInfo_name",
       title: "What's the name of your company?",
       type: 'text',
       isRequired: true
     },
     {
-      name: "companyInfo.industry",
+      name: "companyInfo_industry",
       title: "What industry is your company in?",
       type: "dropdown",
       choices: industryDropdownChoices,
+      showNoneItem: true,
+      showOtherItem: true,
+      isRequired: true
     },
     {
-      name: "companyInfo.size",
+      name: "companyInfo_size",
       title: "How many people are in your company?",
-      type: "number",
+      type: "text",
       inputType: "number",
       min: 1,
       isRequired: true
@@ -45,23 +48,23 @@ const surveyModel = {
     title: 'Company Location',
    elements: [
     {
-      name: "companyInfo.localization.city",
+      name: "companyInfo_localization_city",
       title: "Which city is your company based in?",
       type: "text"
     },
     {
-      name: "companyInfo.localization.state",
+      name: "companyInfo_localization_state",
       title: "Which state is your company based in? (optional)",
       type: "text"
     },
     {
-      name: "companyInfo.localization.postzip",
+      name: "companyInfo_localization_postzip",
       title: "ZIP or postal code?",
       type: "text",
       inputType: "text"
     },
     {
-      name: "companyInfo.localization.timezone",
+      name: "companyInfo_localization_timezone",
       title: "Your company’s time zone (e.g. EST, PST)?",
       type: "text"
     }
@@ -69,13 +72,13 @@ const surveyModel = {
     title: 'Bob Details',
    elements: [
     {
-      name: "bobInfo.specifications.tone",
+      name: "bobInfo_specifications_tone",
       title: "Describe BOB's tone",
       type: "text",
       description: "Example: serious, corporate family, parody, etc."
     },
     {
-      name: "bobInfo.specifications.description",
+      name: "bobInfo_specifications_description",
       title: "How descriptive should BOB be? (1–10)",
       type: "rating",
       rateMin: 1,
@@ -84,7 +87,7 @@ const surveyModel = {
       maxRateDescription: "Very detailed"
     },
     {
-      name: "bobInfo.specifications.avoid",
+      name: "bobInfo_specifications_avoid",
       title: "What phrases or behaviors should BOB avoid?",
       type: "comment",
       description: "List anything BOB should never say or do (comma or line separated)"
@@ -133,6 +136,7 @@ const companyReturn = async (results: any) => {
   });
   if(result){
     console.log("success! Company Added")
+    console.log(result.status, ': ', result.companyId)
     //do stuff when company added, redirect and guide to main user login.
   } else {
     console.error("something went wrong! add failed.")
@@ -140,35 +144,32 @@ const companyReturn = async (results: any) => {
 }
 
 const defineSurveySchema = (survey: any) => {
-  var toneItem, avoidItem, companyItem = []
-  if(survey.data.bobInfo.specifications.tone){
-    toneItem = survey.data.bobInfo.specifications.tone.split(',');
-  }
-  if(survey.data.bobInfo.specifications.avoid){
-    avoidItem = survey.data.bobInfo.specifications.avoid.split(',');
+  var avoidItem, companyItem = []
+  if(survey.data.bobInfo_specifications_avoid){
+    avoidItem = survey.data.bobInfo_specifications_avoid.split(',');
   }
   if(survey.data.companyRoles){
     companyItem = survey.data.companyRoles.split(',');
   }
-  console.log('lets make the guy')
+  console.log(survey.data)
   const finalCompany = {
     companyID: survey.data.companyID,
     companyInfo: {
-      name: survey.data.companyInfo.name,
-      industry: survey.data.companyInfo.industry,
-      size: survey.data.companyInfo.size,
+      name: survey.data.companyInfo_name,
+      industry: survey.data.companyInfo_industry,
+      size: survey.data.companyInfo_size,
       localization: {
-        city: survey.data.companyInfo.localization.city,
-        state: survey.data.companyInfo.localization.state,
-        postzip: survey.data.companyInfo.localization.postzip,
-        timezone: survey.data.companyInfo.localization.timezone,
+        city: survey.data.companyInfo_localization_city,
+        state: survey.data.companyInfo_localization_state,
+        postzip: survey.data.companyInfo_localization_postzip,
+        timezone: survey.data.companyInfo_localization_timezone,
       }
     },
     bobInfo: {
       bobInstanceID: 'BOB-' + generateRandomID(9),
       specifications: {
-        tone: toneItem ?? [],
-        description: survey.data.bobInfo.specifications.description,
+        tone: survey.data.bobInfo_specifications_tone ?? 'default',
+        description: survey.data.bobInfo_specifications_description ?? 5,
         avoid: avoidItem ?? [],
       }
     },

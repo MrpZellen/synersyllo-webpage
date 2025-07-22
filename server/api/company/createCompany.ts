@@ -12,12 +12,17 @@ export default defineEventHandler(async (event) => {
     console.log('company added')
     await insertedCompany.save();
     console.log('company inserted')
+    return {
+      status: 201,
+      message: 'Company created successfully', //me when i lie
+      companyId: insertedCompany.companyID
+    }
   } catch (error) {
     console.log('WHATWENTWRONG', error)
       return {
         status: 400,
-        error: 'company freaked it.',
-        userTaken: true
+        message: 'company EXPLODED.',
+        companyId: null
       }
   }
 })
