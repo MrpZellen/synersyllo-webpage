@@ -1,5 +1,6 @@
 <template>
   <div class=" text-center p-4 font-bold text-lg">What are your plans today, {{ username }}?</div>
+  <div v-if="isAdmin" class="text-center p-4 font-bold text-xl">Signed in as Admin.</div>
   <div class="w-full">
     <div
       v-if="openAddWindow == true"
@@ -111,7 +112,7 @@
 import * as z from 'zod';
 import type { Calendar } from '~/models/Calendar'
 
-reloadNuxtApp();
+const isAdmin = ref(false)
 
 var myCookie = useCookie('google_tokens').value
 const menuClosed = ref(true)
@@ -291,7 +292,10 @@ const removeEvent = async () => {
 
 emitRes('sendLoginUpdate', (myCookie ? true : false))
 
-onMounted(async (event: any) => {
+onMounted(async () => {
+  const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean }>('/api/checkLoginStatus')
+  isAdmin.value = res.isAdmin
+  console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin)
   await buildCalendar();
 })
 </script>

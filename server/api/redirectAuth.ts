@@ -8,11 +8,12 @@ export default defineEventHandler(async (event) => {
   const code = getQuery(event).code
   const state = getQuery(event).state?.toString()!
   const isRegistered = await getRegister(state)
+  const cid = await getCID(state)
   console.log('test api state', state)
   console.log(code)
   try {
     const { tokens } = await new Promise<{ tokens: any }>((resolve, reject) => {
-      oauthClient.getToken(code, (err, tokens) => {
+      oauthClient.getToken(String(code), (err, tokens) => {
         if (err) reject(err);
         else resolve({ tokens });
       });
@@ -94,11 +95,28 @@ export default defineEventHandler(async (event) => {
         }
       })
     }
+    if(adminStatus){
+      setCookie(event, 'adminacc', JSON.stringify({isAdmin: true, cid: cid}), {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+    } else {
+      setCookie(event, 'adminacc', JSON.stringify({isAdmin: false, cid: cid}), {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+    }
     console.log('successful login')
     const tokenInfo = await oauthClient.getTokenInfo(tokens.access_token);
     console.log(adminStatus);
     console.log(getCookie(event, 'google_tokens'))
-    sendRedirect(event, `/calendar/${username}`)
+    sendRedirect(event, `/calendar/${String(username)}`)
     return;
 
   } catch (error) {

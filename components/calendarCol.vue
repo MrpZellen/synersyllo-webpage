@@ -90,15 +90,15 @@ const recall = ref(props.recall)
   eventInfo.forEach(element => {
      var dateString = element.start.dateTime.substring(0, 10);
      let date = new Date(dateString)
-     console.log('date string', dateString)
-     console.log('date test', date)
+     //console.log('date string', dateString)
+     //console.log('date test', date)
      //num math
      var startNumString = element.start.dateTime.substring(11, 13);
      var endNumString = element.end.dateTime.substring(11, 13);
-     console.log('john test', startNumString, endNumString)
+     //console.log('john test', startNumString, endNumString)
      var startNum = parseFloat(startNumString) + (parseFloat(element.start.dateTime.substring(14,16))/60)
      var endNum = parseFloat(endNumString) + (parseFloat(element.end.dateTime.substring(14,16))/60)
-     console.log('better johns', startNum, endNum)
+     //console.log('better johns', startNum, endNum)
 
      var elementHour = Math.trunc(startNum) //truncates to a full number
      var elementChunk = endNum - startNum

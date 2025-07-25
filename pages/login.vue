@@ -78,6 +78,26 @@ const submitLogin = async () => {
       state: id
     })
   })
+  //ESTABLISH CID TOO
+  const cid = await $fetch(`/api/accessUser/getUserCID`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      user: loginInfo.value.username
+    })
+  })
+  const resultCID = await $fetch(`/api/cidstatus/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        companyID: cid,
+        state: id
+      })
+    })
     console.log('api status check. User: ', user, '\nPass: ', pass, '\nisRegistered: ', isRegistered)
     const clientId = encodeURIComponent('431685922807-kr6tslc5l1if280ht90bqgh8h03m4rmb.apps.googleusercontent.com')
     const redirectUri = encodeURIComponent('http://localhost:3000/api/redirectAuth')

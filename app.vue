@@ -6,10 +6,12 @@
     <header>
       <div class="flex flex-row justify-around items-center bg-blue-100">
         <div class="p-3 justify-items-center" @click="home">
-        <img src="/Logo.ico" class="w-15 h-15" /> <div class="text-lg font-bold">SynerSyllo</div> </div>
-        <div class="p-3" v-if="!isLoggedIn" @click="logIn">Login</div>
-        <div class="p-3" v-if="isLoggedIn" @click="logOut">Logout</div>
-        <div class="p-3" v-if="!isLoggedIn" @click="register">Register</div>
+        <img src="/Logo.ico" class="w-15 h-15" /> <div class="text-lg font-bold">SynerSyllo</div> <span class="text-lg" v-if="isAdmin"> - Admin Signin</span> </div>
+        <div class="menuText" v-if="!isLoggedIn" @click="logIn">Login</div>
+        <div class="menuText" v-if="isLoggedIn" @click="logOut">Logout</div>
+        <div class="menuText" v-if="!isLoggedIn" @click="register">Register</div>
+        <div class="menuText" v-if="isAdmin && cid" @click="groups">Manage Groups</div>
+        <div class="menuText" v-if="isAdmin && cid" @click="roles">Manage Roles</div>
       </div>
     </header>
     <main class="flex-grow">
@@ -26,6 +28,8 @@
 <script setup lang="ts">
 //computes and returns a reactive object when the cookie changes
 const isLoggedIn = ref(false)
+const isAdmin = ref(false)
+const cid = ref('')
 
 //NAV STUFF
 const home = () => {
@@ -44,9 +48,18 @@ const register = () => {
   navigateTo('/register')
 }
 
+const groups = () => {
+  navigateTo(`/groups/${cid}`)
+}
+const roles = () => {
+  navigateTo(`/roles/${cid}`)
+}
+
 onMounted(async () => {
-  const res = await $fetch<{ loggedIn: boolean }>('/api/checkLoginStatus')
-  isLoggedIn.value = res.loggedIn
-  console.log(res.loggedIn)
+  const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean, cid: string }>('/api/checkLoginStatus')
+  isLoggedIn.value = res.isLoggedIn
+  isAdmin.value = res.isAdmin
+  cid.value = String(res.cid)
+  console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin, 'is cid', res.cid)
 })
 </script>
