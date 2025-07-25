@@ -100,7 +100,7 @@ const surveyModel = {
       name: "companyRoles",
       title: "What are the roles in your company? (these will start as your groups!)",
       type: "comment",
-      description: "List any role at your company, separate by commas!"
+      description: `List any role at your company, separate by commas! By default, you will have the roles "user" and "admin"`
     }
     ]
   }]
@@ -138,6 +138,7 @@ const companyReturn = async (results: any) => {
     console.log("success! Company Added")
     console.log(result.status, ': ', result.companyId)
     //do stuff when company added, redirect and guide to main user login.
+    navigateTo(`/newCompany/${result.companyId}`)
   } else {
     console.error("something went wrong! add failed.")
   }
@@ -150,6 +151,8 @@ const defineSurveySchema = (survey: any) => {
   }
   if(survey.data.companyRoles){
     companyItem = survey.data.companyRoles.split(',');
+    companyItem.append('admin')
+    companyItem.append('user')
   }
   console.log(survey.data)
   const finalCompany = {
@@ -175,7 +178,7 @@ const defineSurveySchema = (survey: any) => {
     },
     adminAccounts: [],
     website: survey.data.website,
-    companyRoles: companyItem ?? []
+    companyRoles: companyItem ?? ['admin', 'user']
   }
   console.log('guy made')
   return finalCompany

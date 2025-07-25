@@ -1,12 +1,5 @@
 <template>
-  <div class="p-2">{{ currentUserInfo }}'s calendar!</div>
-  <button
-    v-if="isInBG == false"
-    @click="openWindow"
-    class="px-4 py-2 m-3 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold"
-  >
-    Make A New Event
-  </button>
+  <div class=" text-center p-4 font-bold text-lg">What are your plans today, {{ username }}?</div>
   <div class="w-full">
     <div
       v-if="openAddWindow == true"
@@ -80,13 +73,13 @@
         <div class="flex flex-row">
           <button
             @click="back"
-            class="m-1 px-4 py-2 bg-sky-100 rounded hover:bg-sky-300 hover:border-black border-2 border-transparent font-bold"
+            class="m-1 px-4 py-2 bg-funkygreen rounded hover:bg-darkfunk hover:border-black border-2 border-transparent font-bold text-white"
           >
             Back
           </button>
           <button
             @click="removeEvent"
-            class="m-1 px-4 py-2 bg-sky-100 rounded hover:bg-sky-300 hover:border-black border-2 border-transparent font-bold"
+            class="m-1 px-4 py-2 bg-funkygreen rounded hover:bg-darkfunk hover:border-red-500 border-2 border-transparent font-bold text-white"
           >
             Remove Event
           </button>
@@ -105,11 +98,22 @@
       />
     </keep-alive>
   </div>
+  <button
+    v-if="isInBG == false"
+    @click="openWindow"
+    class="px-4 content-center w-1/2 py-2 m-3 bg-funkygreen text-white rounded hover:bg-darkfunk font-bold"
+  >
+    Make A New Event
+  </button>
 </template>
 
 <script setup lang="ts">
 import * as z from 'zod';
 import type { Calendar } from '~/models/Calendar'
+
+reloadNuxtApp();
+
+var myCookie = useCookie('google_tokens').value
 const menuClosed = ref(true)
 const checkValues = z.object({
   eventTitle: z.string(),
@@ -127,6 +131,9 @@ const ends = ref(true)
 const showEndMenu = () => {
   ends.value = !ends.value
 }
+//get user
+const route = useRoute()
+var username = ref(route.params.user)
 //NEW CONCEPT: a reactive allows it to be changed post build
 const items = reactive({
   titleOfCalendar: "",
@@ -163,6 +170,9 @@ var endHourCalc = "1 PM";
 //change state on bg render
 const isInBG = ref(false);
 
+
+//EMIT HANDLES
+const emitRes = defineEmits(['sendLoginUpdate'])
 const retrieveBackData = (payload: any) => {
   isInBG.value = true;
   popOutValues.value = payload;
@@ -171,6 +181,8 @@ const retrieveBackData = (payload: any) => {
   console.log("emitted full!");
 };
 
+
+//CALCULATION MATH FOR CALENDAR TIMES
 const calcResult = (hour: number) => {
   var min = ((hour - Math.floor(hour)) * 60).toString();
   if (min == "0") {
@@ -189,9 +201,13 @@ const calcResult = (hour: number) => {
 
 const buildCalendar = async () => {
 
-  const result = await $fetch<{ calendars: Calendar }>('/api/events/getCalendar', {
+  const result = await $fetch<{ calendars: Calendar }>(`/api/calendar/${username}`, {
     credentials: 'include'
   }).then((result) => {
+    if(!result){
+      console.error('not signed in!')
+      //error page handling
+    }
     items.titleOfCalendar = result.calendars.summary;
     items.themeColor = result.calendars.backgroundColor;
     items.userEmail = result.calendars.id;
@@ -235,7 +251,7 @@ const addEvent = async () => {
       startHour: popOutValues.value.startHour,
       endHour: popOutValues.value.endHour,
       status: 'confirmed',
-      recurrence: popOutValues.value.isRecurring,
+      recurrence: popOutValues.value.isRecurring ?? false,
       recurrenceItems: {
         endsOn: repetitionValues.value.endsOn ?? 'never',
         interval: repetitionValues.value.interval ?? null
@@ -272,7 +288,10 @@ const removeEvent = async () => {
   }
 };
 
-onMounted(async () => {
+
+emitRes('sendLoginUpdate', (myCookie ? true : false))
+
+onMounted(async (event: any) => {
   await buildCalendar();
 })
 </script>

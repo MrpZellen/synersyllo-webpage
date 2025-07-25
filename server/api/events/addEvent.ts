@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
     }
   }
   if(req.recurrence){
+    console.log('freak string: ', `RRULE:FREQ=${(req.recurrenceItems.interval).toUpperCase()};UNTIL=${formattedGoogleFreakCalendarString(new Date(req.recurrenceItems.endsOn))}`)
     if(req.recurrenceItems){
     if((!req.recurrenceItems.interval && req.recurrenceItems.endsOn)){
       return {
@@ -37,7 +38,6 @@ export default defineEventHandler(async (event) => {
       }
   }
   }
-  console.log('freak string: ', `RRULE:FREQ=${(req.recurrenceItems.interval).toUpperCase()};UNTIL=${formattedGoogleFreakCalendarString(new Date(req.recurrenceItems.endsOn))}`)
   console.log('request: ', req)
   try{
     var response = null
@@ -125,6 +125,7 @@ export default defineEventHandler(async (event) => {
 })
 
 const formattedGoogleFreakCalendarString = (dateToString: Date) => {
+  console.log(dateToString)
   var dateString = dateToString.toISOString()
   dateString = dateString.replace('.000', '')
   dateString = dateString.replaceAll('-', '')

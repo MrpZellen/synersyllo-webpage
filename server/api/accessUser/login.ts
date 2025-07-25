@@ -4,29 +4,38 @@ import bcrypt from 'bcryptjs';
 
 export default defineEventHandler(async (event) => {
   let req = await readBody(event)
-  console.log(req)
-  if(!(req.username && req.password)) {
+  console.log(req.authState)
+  //GET USER and PASS from authstate
+  const username = await getUser(req.authState)
+  var password = await getPass(req.authState)
+  if(!password){
+    password = await getPass(req.authState)
+  }
+  console.log('Auth user and pass? ', username, password)
+  if(!(username && password)) {
     return {
-        user: null,
+        info: null,
         status: 400,
-        code: 'wrongUserPass'
+        code: 'wrongUserPass',
+        adminStatus: false
     }
   }
   try {
-    const cookie = await getCookie(event, 'google_tokens')
     await connectDB();
     console.log('made it past connection')
-    const result = await User.findOne({'username': req.username})
+    const result = await User.findOne({'userInfo.username': username})
     console.log('user found: ', result)
+    const adminStatus = result?.employeeData?.isAdmin
     if(!result){
       console.log('our user doesnt exist')
       return {
-        user: null,
+        info: null,
         status: 400,
-        code: 'wrongUserPass'
+        code: 'wrongUserPass',
+        adminStatus: false
       }
     }
-    if(await bcrypt.compare(req.password, result?.userInfo?.password!)){
+    if(await bcrypt.compare(String(password), result?.userInfo!.password?.toString()!)){
       //if true, return successful login
       setCookie(event, 'userloggedin', JSON.stringify(result!), {
       httpOnly: true,
@@ -35,27 +44,34 @@ export default defineEventHandler(async (event) => {
       path: '/',
       maxAge: 60 * 60 * 24 * 3, //3 days
       })
-      //now we are authed up
+      //now we are authed up, set cookie for signin
+      //WAIT, THATS ALREADY DONE BY REDIRECTAUTH :) oh joyous occasion
+      //KILL AUTHSTATE: 
+      await killUser(req.authState)
+      await killPass(req.authState)
       return {
-        user: req.username,
+        info: username,
         status: 200,
-        code: 'success'
+        code: 'success',
+        adminStatus: adminStatus
       }
     } else {
       //false, return problem
       console.log('bad hash')
       return {
-        user: null,
+        info: null,
         status: 400,
-        code: 'wrongUserPass'
+        code: 'wrongUserPass',
+        adminStatus: false
       }
     }
   } catch (error) {
     console.log('WHATWENTWRONG', error)
       return {
-        user: null,
+        info: null,
         status: 400,
-        code: 'failed'
+        code: 'failed',
+        adminStatus: false
       }
   }
 })

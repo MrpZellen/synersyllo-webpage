@@ -13,7 +13,7 @@
       </div>
     </header>
     <main class="flex-grow">
-      <NuxtPage />
+      <NuxtPage/>
     </main>
     <footer class="footer sm:footer-horizontal bg-blue-100 text-neutral-content p-10 mt-10">
       <small>
@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+//computes and returns a reactive object when the cookie changes
 const isLoggedIn = ref(false)
 
 //NAV STUFF
@@ -42,4 +43,10 @@ const logOut = () => {
 const register = () => {
   navigateTo('/register')
 }
+
+onMounted(async () => {
+  const res = await $fetch<{ loggedIn: boolean }>('/api/checkLoginStatus')
+  isLoggedIn.value = res.loggedIn
+  console.log(res.loggedIn)
+})
 </script>

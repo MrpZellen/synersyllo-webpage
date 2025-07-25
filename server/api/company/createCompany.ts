@@ -1,5 +1,4 @@
 import connectDB from "~/server/utils/db";
-import { ObjectId } from "mongodb";
 import Company from "~/models/Company";
 
 export default defineEventHandler(async (event) => {
@@ -8,11 +7,15 @@ export default defineEventHandler(async (event) => {
   try { 
     await connectDB();
     console.log('making company')
+
     const insertedCompany = new Company(req)
     console.log('company added')
-    console.log('Company schema paths:', Company.schema.paths)
-    await insertedCompany.save();
-    console.log('company inserted')
+    const result = await insertedCompany.save();
+    console.log('company inserted', result);   
+
+    let x = await Company.find({});
+    console.log("huzzah", x)
+
     return {
       status: 201,
       message: 'Company created successfully', //me when i lie

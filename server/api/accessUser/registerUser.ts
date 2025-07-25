@@ -1,7 +1,10 @@
 import connectDB from "~/server/utils/db";
 import { ObjectId } from "mongodb";
 import User from "~/models/User";
-import { getUser, killUser } from '~/server/utils/sessionStorage'
+import { getUser, getPass, killPass, killUser, getCID, killCID, getAdmin } from '~/server/utils/sessionStorage'
+import { useHydration } from "nuxt/app";
+import bcrypt from "bcryptjs";
+import { getActionDropdownButtonTarget } from "survey-core";
 
 export default defineEventHandler(async (event): Promise<any> => {
   let req = await readBody(event)
@@ -11,33 +14,76 @@ export default defineEventHandler(async (event): Promise<any> => {
     await connectDB();
     console.log('whatthejohn: ', req.authState, " ", typeof req.authState)
     var finalUsername = await getUser(req.authState)
-    console.log('fuser: ', finalUsername)
-    await User.deleteOne({ "userInfo.username": "bengerman" });
+    var finalPass = await getPass(req.authState)
+    var finalCID = await getCID(req.authState)
+    if (!finalPass){
+      finalPass = await getPass(req.authState)
+    }
+    const hashPass = await bcrypt.hash(String(finalPass), 10)
+  console.log('Auth user and pass? ', finalUsername, finalPass)
+    if(!finalPass){
+      return {
+        status: 400,
+        info:  'passfail',
+        userData: null
+      }
+    }
+
+    //CHECK IF WE HAVE AN ADMIN USER
+    var finalAdmin = await getAdmin(req.authState)
+    var finalRole = 'user'
+    if(!finalAdmin){
+      finalAdmin = false
+    } else {
+      finalRole = 'admin'
+    }
+    await User.deleteOne({ "userInfo.username": "zellency" });
     console.log('made it past connection')
     const insertedUser = new User({
       userInfo: {
-        CID: new ObjectId('686755fecde1ad0903e825a4'),
+        CID: finalCID,
         username: finalUsername,
+        password: hashPass,
         email: user.email,
         fName: user.userDeets.name,
         lName: user.userDeets.lastName,
         profilePhoto: user.userDeets.photo
       },
       employeeData: {
-        role: 'test',
+        role: finalRole,
+        isAdmin: finalAdmin
       }
     })
     console.log('user added')
-    await insertedUser.save();
+    const savedUser = await insertedUser.save();
+    if(finalAdmin){
+      const result = await $fetch(`/api/company/addAdminUser`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uid: savedUser._id,
+          CID: finalCID
+        })
+      })
+    }
     console.log('user inserted')
     //now we clear state variable
     killUser(req.authState)
+    killPass(req.authState)
+    killCID(req.authState)
+    return {
+      status: 200,
+      info: 'we good :)',
+      userData: finalUsername
+    }
   } catch (error) {
     console.log('WHATWENTWRONG', error)
       return {
         status: 400,
-        error: 'user taken.',
-        userTaken: true
+        info: 'user taken.',
+        userData: null
       }
   }
 })

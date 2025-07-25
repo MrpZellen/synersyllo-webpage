@@ -8,6 +8,7 @@
 </template>
 <script setup lang="ts">
 //variables
+var myCookie = useCookie('google_tokens').value
 
 const navToAuth = async () => {
   await navigateTo('/userAuth')
@@ -16,4 +17,9 @@ const navToAuth = async () => {
 const signUpCompany = async () => {
   await navigateTo('/newCompany')
 }
+
+const emitRes = defineEmits(['sendLoginUpdate'])
+onMounted(async (event: any) => {
+  emitRes('sendLoginUpdate', (myCookie ? true : false))
+});
 </script>

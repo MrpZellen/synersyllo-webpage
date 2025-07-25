@@ -7,7 +7,7 @@ const userSchema = new Schema({
     lName: { type: String },
     username: { type: String, required: true, unique: true },
     password: { type: String },
-    CID: { type: Schema.Types.ObjectId, ref: 'Company' },
+    CID: { type: String, ref: 'Company' },
     email: { type: String, required: true },
     profilePhoto: {type: String}
   },
