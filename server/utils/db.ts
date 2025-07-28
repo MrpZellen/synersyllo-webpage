@@ -7,7 +7,7 @@ export default async function connectDB() {
     console.log('CONNECTION CLEARED')
   }
   try {
-    await mongoose.connect('mongodb://mongo:27017/company_storage?directConnection=true&replicaSet=false')
+    await mongoose.connect('mongodb://mongo:27017/company_storage?directConnection=true')
     mongoose.set('debug', true)
     console.log('success')  
   } catch (err) {

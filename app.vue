@@ -49,10 +49,10 @@ const register = () => {
 }
 
 const groups = () => {
-  navigateTo(`/groups/${cid}`)
+  navigateTo(`/groups/${cid.value}`)
 }
 const roles = () => {
-  navigateTo(`/roles/${cid}`)
+  navigateTo(`/roles/${cid.value}`)
 }
 
 onMounted(async () => {

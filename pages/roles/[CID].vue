@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>Welcome in, {{ admin }}! What would you like to do?</div>
+    <div>Welcome in! What would you like to do?</div>
     <div>
       <button
             @click="addRoles"
