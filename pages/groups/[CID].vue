@@ -216,8 +216,8 @@ const createGroup = async () => {
   if(!resultOfLeadUser){
     console.error('something went wrong! leadUser not found')
   }
-  console.log(resultOfLeadUser)
-  let leadUser = (resultOfLeadUser).info[0]._id
+  console.log('resultOfLeadUser: ', resultOfLeadUser)
+  let leadUser = await (resultOfLeadUser).info._id
   const res = await $fetch<{group: typeof Group}>(`/api/groups/createGroup`, {
     method: 'POST',
     headers: {

@@ -1,5 +1,6 @@
 import connectDB from "~/server/utils/db";
 import User from "~/models/User";
+import mongoose from "mongoose";
 
 export default defineEventHandler(async (event) => {
   let req = await readBody(event)
@@ -7,8 +8,8 @@ export default defineEventHandler(async (event) => {
   const uid = req.username
   console.log('got id: ', req.username)
   try {
-    await connectDB()
-    
+    await connectDB();
+    await new Promise(resolve => setTimeout(resolve, 10));
     console.log('made it past connection')
     const result = await User.find({ 'userInfo.username': req.username }).lean() //lean guarantees we return a javascript object
     console.log('user found: ', result)
