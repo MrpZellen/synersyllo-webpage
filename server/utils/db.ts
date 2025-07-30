@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 
 export default async function connectDB() {
   if (mongoose.connection.readyState === 1){
-    mongoose.disconnect()
+    await mongoose.disconnect()
     console.log('already connected')
   }
   if (mongoose.connection.readyState === 2) {

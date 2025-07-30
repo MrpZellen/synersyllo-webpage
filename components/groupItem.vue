@@ -4,6 +4,9 @@
     <div v-if="userList.length >= 1" class="text-center p-1 font-bold text-lg">Members: <span class="px-1 text-wrap text-lg" v-for="(item, index) in userList">
       {{item}}<span v-if="index < userList.length - 1">, </span><!--DO NOT RENDER THE COMMA IF INDEX IS LESS THAN MAX-->
     </span></div>
+    <div v-if="permittedRoles.length >= 1" class="text-center p-1 font-bold text-xl">Permitted Roles: <span class="px-1 text-wrap text-lg" v-for="(item, index) in permittedRoles">
+      {{item}}<span v-if="index < permittedRoles.length - 1">, </span><!--DO NOT RENDER THE COMMA IF INDEX IS LESS THAN MAX-->
+    </span></div>
   <div class="flex flex-col">
     <button
             @click="editGroup"
@@ -23,7 +26,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ObjectId } from 'bson';
 import type { InferSchemaType } from 'mongoose';
 import type User from '~/pages/calendar/[user].vue';
 type UserDoc = InferSchemaType<typeof User.schema>
@@ -49,17 +51,20 @@ const deleteGroup = async () => {
 
 onMounted(async () => {
   //parse and get users
-const returnedResults: string[] = await Promise.all(props.members.map(async (member) => {
-      var result = await $fetch<{info: typeof User, status: number, code: string}>(`/api/accessUser/getUser`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }, 
-      body: JSON.stringify({
-        _id: member
-      })
-    })
-    console.log('made it back: ', result)
+  const returnedResults: string[] = [];
+  for (const member of props.members) {
+    try {
+      const result = await $fetch<{info: any, status: number, code: string}>(`/api/accessUser/getUser`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          _id: member
+        })
+      });
+      
+    console.log('made it back: ', result);
     if(result.status == 400){
       console.error(result.code)
       return 'ERROR'
@@ -72,7 +77,7 @@ const returnedResults: string[] = await Promise.all(props.members.map(async (mem
       finalString += fName
     }
     if(lName){
-      finalString += lName
+      finalString += (' ' + lName)
     }
     if(!fName && !lName){
       finalString += result.info.userInfo.username
@@ -80,8 +85,10 @@ const returnedResults: string[] = await Promise.all(props.members.map(async (mem
     if(finalString === ''){
       finalString += 'ERROR'
     }
-    return finalString
-  }));
+    returnedResults.push(finalString)
+  } catch (error){
+    console.error('something went wrong: ', error)
+  }};
   userList.value = returnedResults
 })
 </script>

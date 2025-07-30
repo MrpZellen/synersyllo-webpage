@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     await connectDB()
     
     console.log('made it past connection')
-    const result = await User.find({ 'userInfo.username': req.username }) //lean guarantees we return a javascript object
+    const result = await User.find({ 'userInfo.username': req.username }).lean() //lean guarantees we return a javascript object
     console.log('user found: ', result)
     if(!result){
       console.log('our user doesnt exist')

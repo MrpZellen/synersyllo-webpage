@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
         code: 'BAD ID'
       }
     }
-    const result = await User.findById(uid) //lean guarantees we return a javascript object
+    const result = await User.findById(uid).lean() //lean guarantees we return a javascript object
     console.log('user: ', result)
     if(!result){
       console.log('our user doesnt exist')

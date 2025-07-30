@@ -197,7 +197,7 @@ const createGroup = async () => {
         username: member
       })
     })
-    return await new ObjectId(memberID.info!._id)
+    return await memberID.info!._id
   }));
   if(!resultMemberIDS){
     console.error('issue getting memberIDS!')
