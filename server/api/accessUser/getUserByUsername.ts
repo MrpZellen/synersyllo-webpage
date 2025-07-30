@@ -1,0 +1,37 @@
+import connectDB from "~/server/utils/db";
+import User from "~/models/User";
+
+export default defineEventHandler(async (event) => {
+  let req = await readBody(event)
+  //GET USER and PASS from authstate
+  const uid = req.username
+  console.log('got id: ', req.username)
+  try {
+    await connectDB()
+    
+    console.log('made it past connection')
+    const result = await User.find({ 'userInfo.username': req.username }) //lean guarantees we return a javascript object
+    console.log('user found: ', result)
+    if(!result){
+      console.log('our user doesnt exist')
+      return {
+        info: null,
+        status: 400,
+        code: 'no user by that id',
+      }
+    } else {
+      return {
+        info: JSON.parse(JSON.stringify(result)),
+        status: 200,
+        code: 'user found!',
+      }
+    }
+  } catch (error) {
+    console.log('WHATWENTWRONG', error)
+      return {
+        info: null,
+        status: 400,
+        code: 'failed',
+      }
+  }
+})

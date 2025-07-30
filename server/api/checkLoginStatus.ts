@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
   return{
     isLoggedIn: res1,
     isAdmin: res2,
-    cid: JSON.parse(adminCookie!).cid.cid.toString()
+    cid: JSON.parse(adminCookie!).cid.cid.toString(),
+    username: JSON.parse(adminCookie!).cid.info.toString()
   }
 })

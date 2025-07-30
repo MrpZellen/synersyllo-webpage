@@ -29,6 +29,7 @@
 //computes and returns a reactive object when the cookie changes
 const isLoggedIn = ref(false)
 const isAdmin = ref(false)
+const username = ref('')
 const cid = ref('')
 
 //NAV STUFF
@@ -49,16 +50,17 @@ const register = () => {
 }
 
 const groups = () => {
-  navigateTo(`/groups/${cid.value}`)
+  navigateTo({path: `/groups/${cid.value}`, query: { username: username.value }})
 }
 const roles = () => {
   navigateTo(`/roles/${cid.value}`)
 }
 
 onMounted(async () => {
-  const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean, cid: string }>('/api/checkLoginStatus')
+  const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean, cid: string, username: string }>('/api/checkLoginStatus')
   isLoggedIn.value = res.isLoggedIn
   isAdmin.value = res.isAdmin
+  username.value = res.username
   cid.value = String(res.cid)
   console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin, 'is cid', res.cid)
 })

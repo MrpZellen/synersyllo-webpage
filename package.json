@@ -15,6 +15,7 @@
     "@oxc-parser/binding-linux-x64-gnu": "^0.75.0",
     "@tailwindcss/vite": "^4.1.11",
     "bcryptjs": "^3.0.2",
+    "bson": "^6.10.4",
     "google-auth-library": "^10.1.0",
     "googleapis": "^150.0.1",
     "izitoast": "^1.4.0",
