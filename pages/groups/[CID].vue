@@ -186,7 +186,7 @@ const groupVars = reactive<{
 const createGroup = async () => {
   console.log('creating a group!')
   //first, parse users input into actual members:
-  const resultMemberIDS = await Promise.all(groupVars.members.replaceAll(' ', '').split(',').map(async (member) => { //regex splits on NEW LINE AND COMMA
+  const resultMemberIDS = await Promise.all(groupVars.members.replaceAll(' ', '').split(',').map(async (member, index) => { //regex splits on NEW LINE AND COMMA
     //WE NEED TO GET ALL MEMBERS BACK AS ID's
     const memberID = await $fetch<{info: any}>('/api/accessUser/getUserByUsername', {
       method: 'POST',

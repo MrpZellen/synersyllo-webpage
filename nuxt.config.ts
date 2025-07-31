@@ -16,12 +16,14 @@ export default defineNuxtConfig({
       tailwindcss(),
     ]
   },
-  modules: ['nuxt-mongoose', 'nuxt-toast'],
   runtimeConfig: {
     OAUTHID: process.env.NUXT_OAUTHID,
     OAUTHSECRET: process.env.NUXT_OAUTHSECRET,
     REDIRECT: process.env.NUXT_REDIRECT
   }, //unstorage definitions
+  modules: [
+    'nuxt-mongoose',
+  ],
   nitro: {
     storage: {
       production: {

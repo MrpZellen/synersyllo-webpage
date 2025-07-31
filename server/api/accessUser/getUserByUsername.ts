@@ -8,8 +8,6 @@ export default defineEventHandler(async (event) => {
   const uid = req.username
   console.log('got id: ', req.username)
   try {
-    await connectDB();
-    await new Promise(resolve => setTimeout(resolve, 10));
     console.log('made it past connection')
     const result = await User.findOne({ 'userInfo.username': req.username }).lean() //lean guarantees we return a javascript object
     console.log('user found: ', result)

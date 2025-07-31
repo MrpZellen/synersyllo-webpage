@@ -5,8 +5,8 @@ import Group from "~/models/Group";
 export default defineEventHandler(async (event) => {
   let req = await readBody(event)
   console.log('straight up req-in it:', req)
-  try { 
-    await connectDB();
+  try {
+    await connectDB()
     console.log(req.admin)
     if(!req.admin){
       return {
@@ -16,9 +16,9 @@ export default defineEventHandler(async (event) => {
       }
     }
     console.log('getting companyID')
-    const result = await Group.find({ CID: req.CID })
+    const result = await Group.findOne({ CID: req.CID })
     console.log('groups found', result);
-    if(!result){
+    if(result === null){
       console.error('NO groups yet?')
       return {
         status: 400,
