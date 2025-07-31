@@ -1,5 +1,14 @@
 <template>
-  <div>
+  <div v-if="!isValidLogin" class="text-red-500 flex flex-grow place-content-center items-center">
+    <div class="text-start p-7 font-bold text-4xl flex flex-col">Sorry but you cannot access this page.
+    <div class="text-start font-bold text-4xl"> This is due to one of the following: </div>
+      <div class="text-start p-7 font-bold text-2xl"> - Wrong CID or User. </div>      
+      <div class="text-start p-7 font-bold text-2xl"> - You are not logged in. </div>
+      <div class="text-start p-7 font-bold text-2xl"> - You are not permitted to view this page. </div>
+    </div>
+    
+  </div>
+  <div v-if="isValidLogin">
     <div class="text-center p-7 font-bold text-4xl">Welcome in {{ admin }}! Manage your groups:</div>
     <div v-if="openAddWindow == true"
       class="absolute z-50 p-5 top-2/10 left-4/10 min-w-[250px] min-h-[400px] rounded-sm bg-synsyl-lightblue border-2 border-synsyl-nilbog shadow-lg">
@@ -126,9 +135,9 @@
             Create a group
           </button>
     </div>
-    <div v-if="groupStorage">
-      <div class="grid grid-cols-4 m-4" v-for="(group) in groups">
-        <group-item class="p-5" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
+    <div v-if="groupStorage" class="m-5 grid grid-cols-4 row-auto gap-4">
+      <div v-for="(group) in groups">
+        <group-item class="p-5" :adminOfPage="String(admin)" :groupID="group.GID" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
       </div>
     </div>
   </div>
@@ -145,6 +154,19 @@ console.log('reached page /groups')
 const router = useRoute();
 const admin = router.query.username
 const CID = router.params.CID
+const testValues = await $fetch<{ cid: string, username: string }>((`/api/checkLoginStatus`), {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+const isValidLogin = ref(false)
+if (testValues.cid !== CID || testValues.username !== admin){
+  isValidLogin.value = false
+} else {
+  isValidLogin.value = true
+}
+
 var groupStorage = ref<GroupType[]>([])
 const groups = computed(() => groupStorage.value);
 
@@ -211,7 +233,7 @@ const createGroup = async () => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username: groupVars.groupLead[0]
+      username: groupVars.groupLead
     })
   })
   if(!resultOfLeadUser){
@@ -228,9 +250,10 @@ const createGroup = async () => {
       admin: admin,
       newGroup: {
         CID: CID,
+        GID: 'GID-' + generateRandomID(9),
         name: groupVars.name ?? `default`,
         members: resultMemberIDS,
-        permittedRoles: groupVars.permittedRoles,
+        permittedRoles: groupVars.permittedRoles ?? ['admin', 'user'],
         groupLead: [leadUser],
         BobID: 'BOB-' + generateRandomID(9), //generate a BOB ID TODO: create the bob instance in company, tie it to that
         GroupStatus: groupVars.groupStatus,
@@ -246,13 +269,13 @@ const createGroup = async () => {
     console.error('error making the new group!!!')
   } else {
     console.log('group created successfully!!')
-    groupStorage.value.push(res.group)
+    groupStorage.value.push(new (res.group))
   }
   openAddWindow.value = false;
   console.log('hit')
 }
 const getGroup = async () => {
-  const res = await $fetch<{groups: GroupType[]}>(`/api/groups/getGroup`, {
+  const res = await $fetch<{groups: GroupType[], status: number}>(`/api/groups/getGroup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -262,12 +285,12 @@ const getGroup = async () => {
       admin: admin
     })
   })
-  if(!res.groups){
+  if(res.status === 400){
     console.error('error retrieving groups!!!')
   }
   //now we have the groups, use em
   groupStorage.value = res.groups
-
+  reloadNuxtApp();
 }
 
 

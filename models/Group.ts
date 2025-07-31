@@ -18,6 +18,7 @@ const SurveyAdditionSchema = new mongoose.Schema({
 
 const GroupSchema = new mongoose.Schema({
   CID: { type: String, required: true },
+  GID: { type: String, required: true },
   name: { type: String, required: true },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
   permittedRoles: [{ type: String, required: false }],

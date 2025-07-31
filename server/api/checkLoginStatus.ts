@@ -18,7 +18,8 @@ export default defineEventHandler(async (event) => {
     return {
       isLoggedIn: res1,
       isAdmin: res2,
-      cid: null
+      cid: null,
+      username: null
     }
   }
   console.log(' UP ADMIN IT:', JSON.parse(adminCookie!))

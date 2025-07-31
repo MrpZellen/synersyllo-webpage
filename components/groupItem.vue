@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col content-center bg-funkygreen min-w-50 hover:border-synsyl-darkgreen border-6 border-transparent rounded">
+  <div class="flex flex-col content-center bg-funkygreen hover:border-synsyl-darkgreen border-6 border-transparent rounded">
     <div class="text-center p-1 font-bold text-3xl">{{props.title.replaceAll('-', ' ') ?? 'No Name Johns'}}</div>
     <div class="text-center p-1 font-bold text-2xl">GROUP LEAD: {{ finalLead }}</div>
     <div v-if="userList.length >= 1" class="text-center p-1 font-bold text-lg">Members: <span class="px-1 text-wrap text-lg" v-for="(item, index) in userList">
@@ -10,7 +10,7 @@
     </span></div>
   <div class="flex flex-col">
     <button
-            @click="editGroup"
+            @click="() => {openEditMenu = true}"
             class="m-1 px-4 py-2 bg-sky-100 rounded hover:bg-sky-200 hover:border-synsyl-darkgreen border-2 border-transparent font-bold"
           >
             Edit group
@@ -23,6 +23,56 @@
           Delete group
         </button>
   </div>
+
+  <div v-if="openEditMenu == true"
+      class="absolute z-50 p-5 top-2/10 left-4/10 min-w-[250px] min-h-[400px] rounded-sm bg-synsyl-lightblue border-2 border-synsyl-nilbog shadow-lg">
+      <div class="text-2xl p-2">
+        Change Name: <input v-model="editVars.name" />
+      </div>
+      <div class="text-2xl p-2">
+        Change Leader: <input v-model="editVars.groupLead"/>
+      </div>
+      <div class="flex flex-col text-xl p-2">
+        Add members (separated by commas!):
+        <textarea class="border-2 border-synsyl-darkgreen my-1 p-1 h-[100px]"
+          v-model="editVars.addMem"
+          placeholder="enter members..."
+        />
+      </div>
+      <div class="flex flex-col text-xl p-2">
+        Remove members (separated by commas!):
+        <textarea class="border-2 border-synsyl-darkgreen my-1 p-1 h-[100px]"
+          v-model="editVars.remMem"
+          placeholder="enter members..."
+        />
+      </div>
+      <div class="flex flex-col text-xl p-2">
+        Add Roles
+        <textarea class="border-2 border-synsyl-darkgreen my-1 p-1 h-[100px]"
+          v-model="editVars.addRoles"
+          placeholder="If left empty, any will be assumed ok!"
+        />
+      </div>
+      <div class="flex flex-col text-xl p-2">
+        Remove Roles
+        <textarea class="border-2 border-synsyl-darkgreen my-1 p-1 h-[100px]"
+          v-model="editVars.remRoles"
+          placeholder="If left empty, any will be assumed ok!"
+        />
+      </div>
+      <button
+            @click="closeWindow"
+            class="m-1 px-4 py-2 bg-sky-100 rounded hover:bg-sky-200 hover:border-synsyl-darkgreen border-2 border-transparent font-bold"
+          >
+            Back
+          </button>
+      <button
+            @click="editGroup"
+            class="m-1 px-4 py-2 bg-sky-100 rounded hover:bg-sky-200 hover:border-synsyl-darkgreen border-2 border-transparent font-bold"
+          >
+            Finalize
+          </button>
+      </div>
   </div>
 </template>
 
@@ -34,6 +84,8 @@ const finalLead = ref('')
 
 //doing any due to data access
 const props = defineProps<{
+  adminOfPage: string,
+  groupID: string,
   title: string,
   members: UserDoc[],
   lead: string,
@@ -41,14 +93,49 @@ const props = defineProps<{
   groupStatus: number
 }>();
 
+const editVars = reactive<{
+  name: string,
+  groupLead: string,
+  addMem: string,
+  remMem: string,
+  addRoles: string,
+  remRoles: string
+}>({
+  name: '',
+  groupLead: '',
+  addMem: '',
+  remMem: '',
+  addRoles: '',
+  remRoles: ''
+});
+
 let userList = ref<string[]>([])
 
+const openEditMenu = ref(false)
 
 const editGroup = async () => {
-
 }
 const deleteGroup = async () => {
-  
+  const result = await $fetch<{info: any, status: number, code: string}>(`/api/groups/deleteGroups`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      gid: props.groupID,
+      admin: props.adminOfPage
+    })
+  })
+  if(result.status === 400){
+    console.error('problem deleting group!!!!')
+  } else {
+    console.log('group deleted successfully')
+    reloadNuxtApp()
+  }
+}
+const closeWindow = () => {
+  openEditMenu.value = false;
+  console.log('hit')
 }
 
 onMounted(async () => {

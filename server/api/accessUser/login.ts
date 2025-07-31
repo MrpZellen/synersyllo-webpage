@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
   //GET USER and PASS from authstate
   const username = await getUser(req.authState)
   var password = await getPass(req.authState)
+  const email = await req.email
   if(!password){
     password = await getPass(req.authState)
   }
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
   try {
     await connectDB();
     console.log('made it past connection')
-    const result = await User.findOne({'userInfo.username': username})
+    const result = await User.findOne({'userInfo.email': email})
     console.log('user found: ', result)
     const adminStatus = result?.employeeData?.isAdmin
     if(!result){
@@ -49,8 +50,9 @@ export default defineEventHandler(async (event) => {
       //KILL AUTHSTATE: 
       await killUser(req.authState)
       await killPass(req.authState)
+      console.log(result.userInfo!.username)
       return {
-        info: username,
+        info: result.userInfo?.username,
         status: 200,
         code: 'success',
         adminStatus: adminStatus

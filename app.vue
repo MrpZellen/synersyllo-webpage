@@ -10,8 +10,8 @@
         <div class="menuText" v-if="!isLoggedIn" @click="logIn">Login</div>
         <div class="menuText" v-if="isLoggedIn" @click="logOut">Logout</div>
         <div class="menuText" v-if="!isLoggedIn" @click="register">Register</div>
-        <div class="menuText" v-if="isAdmin && cid" @click="groups">Manage Groups</div>
-        <div class="menuText" v-if="isAdmin && cid" @click="roles">Manage Roles</div>
+        <div class="menuText" v-if="isAdmin && cid" @click="groups">Manage Company Groups</div>
+        <div class="menuText" v-if="isLoggedIn && cid" @click="userGroups">View Your Groups</div>
       </div>
     </header>
     <main class="flex-grow">
@@ -52,8 +52,8 @@ const register = () => {
 const groups = () => {
   navigateTo({path: `/groups/${cid.value}`, query: { username: username.value }})
 }
-const roles = () => {
-  navigateTo(`/roles/${cid.value}`)
+const userGroups = () => {
+  navigateTo(`/groups/user/${username.value}`)
 }
 
 onMounted(async () => {

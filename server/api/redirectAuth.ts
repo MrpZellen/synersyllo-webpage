@@ -9,6 +9,8 @@ export default defineEventHandler(async (event) => {
   const state = getQuery(event).state?.toString()!
   const isRegistered = await getRegister(state)
   const cid = await getCID(state)
+  var usernameInAuth = await getUser(state)
+  let successfulBountifulFortuneOfWorking = false
   console.log('test api state', state)
   console.log(code)
   try {
@@ -28,8 +30,7 @@ export default defineEventHandler(async (event) => {
 
     var username: string;
     var adminStatus: boolean = false
-    if(isRegistered){ //ONLY IF WE ARE REGISTERING
-      oauthClient.setCredentials(tokens);
+    oauthClient.setCredentials(tokens);
       console.log('Received tokens:', tokens);
       const oauth2 = google.oauth2({
         auth: oauthClient,
@@ -50,6 +51,7 @@ export default defineEventHandler(async (event) => {
           lastName: yummyUserInformation.family_name
         }
       }
+    if(isRegistered){ //ONLY IF WE ARE REGISTERING
       username = '';
       await $fetch('/api/accessUser/registerUser', {
         method: 'POST',
@@ -65,6 +67,7 @@ export default defineEventHandler(async (event) => {
             console.log('success')
             username = data.userData
             adminStatus= data.adminStatus
+            successfulBountifulFortuneOfWorking = true
           } else {
             console.error('failed to fetch result, submit failed!')
             sendRedirect(event, `/register`)
@@ -80,46 +83,57 @@ export default defineEventHandler(async (event) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          authState: state
+          authState: state,
+          email: yummyUserInformation.email
         })
       }).then((data) => {
-        if(data.status != 400){
+        var checkUser = usernameInAuth
+        console.log(checkUser, typeof checkUser, data.info!, typeof data.info!, ' OVER HERE LOOK HERE :)')
+        if(checkUser === data.info){
           console.log('success auth:login')
-          console.log(data)
           username = String(data.info)
           adminStatus = Boolean(data.adminStatus)
+          successfulBountifulFortuneOfWorking = true
+          console.log('how bountiful')
         } else {
           console.error('failed to fetch result, submit failed!')
-          sendRedirect(event, `/login`)
+          sendRedirect(event, `/login?floppedLogin=true`)
           return
         }
       })
     }
-    if(adminStatus){
-      setCookie(event, 'adminacc', JSON.stringify({isAdmin: true, cid: cid}), {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-    });
+    if(successfulBountifulFortuneOfWorking){ //if login successful
+      console.log('jolly good show')
+      if(adminStatus){
+        setCookie(event, 'adminacc', JSON.stringify({isAdmin: true, cid: cid}), {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+      });
+      console.log('defined an admin mmyes')
+      } else {
+        setCookie(event, 'adminacc', JSON.stringify({isAdmin: false, cid: cid}), {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+      });
+      console.log('defined a NON admin mmyes')
+      }
+      console.log('successful login')
+      const tokenInfo = await oauthClient.getTokenInfo(tokens.access_token);
+      console.log(adminStatus);
+      await sendRedirect(event, `/calendar/${String(username)}`)
+      return;
     } else {
-      setCookie(event, 'adminacc', JSON.stringify({isAdmin: false, cid: cid}), {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-    });
+      throw console.error('FAILED LOGIN/REGISTRATION, google matching issues');
     }
-    console.log('successful login')
-    const tokenInfo = await oauthClient.getTokenInfo(tokens.access_token);
-    console.log(adminStatus);
-    console.log(getCookie(event, 'google_tokens'))
-    sendRedirect(event, `/calendar/${String(username)}`)
-    return;
 
   } catch (error) {
+    sendRedirect(event, `/login?floppedLogin=true`)
     return error
   }
 })

@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-grow justify-around items-center space-y-4 space-x-4 flex-col">
     <div class="text-2xl font-bold p-3">Log into SynerSyllo</div>
+    <div v-if="googleFail" class="text-red-500 text-xs font-bold">Please login with your linked google account!</div>
     <div
       class="p-5 rounded-sm bg-blue-300 border-2 border-black shadow-lg flex flex-col space-x-4 space-y-4"
      >
@@ -23,8 +24,17 @@
 <script setup lang="ts">
 import * as z from 'zod';
 import { v4 as uuidv4 } from 'uuid'
+const route = useRoute()
 const failedPass = ref(false)
 const failedUser = ref(false)
+const googleFail = computed(() => route.query.floppedLogin === 'true')
+
+if(googleFail){
+    const result = await $fetch('/api/accessUser/logout')
+  if(!(result.status === 200)){
+    console.log('LITERALLY HOW.')
+  } 
+}
 const loginInfo = ref<{
   password: string,
   username: string
