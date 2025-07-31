@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
       }
     }
     console.log('getting companyID')
-    const result = await Group.findOne({ CID: req.CID })
+    const result = await Group.find({ CID: req.CID })
     console.log('groups found', result);
     if(result === null){
       console.error('NO groups yet?')

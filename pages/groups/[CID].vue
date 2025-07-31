@@ -127,8 +127,8 @@
           </button>
     </div>
     <div v-if="groupStorage">
-      <div class="grid grid-cols-4 m-4" v-for="group in groupStorage">
-        <group-item class="p-5" :title="group.name" :members="group.members" :lead="group.groupLead.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
+      <div class="grid grid-cols-4 m-4" v-for="(group) in groups">
+        <group-item class="p-5" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
       </div>
     </div>
   </div>
@@ -139,13 +139,14 @@ import Group from '~/models/Group';
 import { ObjectId } from 'bson';
 import { generateRandomID } from '~/server/utils/stringGenerator';
 import type { InferSchemaType } from 'mongoose';
+import type { GroupType } from '~/models/GroupInterface';
 //defined a type for my Group schema, more efficient and clean
-type GroupArray = InferSchemaType<typeof Group.schema>[]
 console.log('reached page /groups')
 const router = useRoute();
 const admin = router.query.username
 const CID = router.params.CID
-var groupStorage = ref<GroupArray>([])
+var groupStorage = ref<GroupType[]>([])
+const groups = computed(() => groupStorage.value);
 
 const additionalSelection = ref(false)
 const openAddWindow = ref(false)
@@ -210,7 +211,7 @@ const createGroup = async () => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username: groupVars.groupLead
+      username: groupVars.groupLead[0]
     })
   })
   if(!resultOfLeadUser){
@@ -245,11 +246,13 @@ const createGroup = async () => {
     console.error('error making the new group!!!')
   } else {
     console.log('group created successfully!!')
-    groupStorage.value.push(new Group(res.group))
+    groupStorage.value.push(res.group)
   }
+  openAddWindow.value = false;
+  console.log('hit')
 }
 const getGroup = async () => {
-  const res = await $fetch<{groups: GroupArray}>(`/api/groups/getGroup`, {
+  const res = await $fetch<{groups: GroupType[]}>(`/api/groups/getGroup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -264,7 +267,6 @@ const getGroup = async () => {
   }
   //now we have the groups, use em
   groupStorage.value = res.groups
-  console.log(groupStorage.value)
 
 }
 
@@ -310,6 +312,7 @@ const responseRemove = (ourCurrentSurveyNumber: number) => {
 
 onMounted(async () => {
   await getGroup()
+  console.log('OUR GROUP STORED: ', groups, groups.value)
 }) 
 </script>
 
