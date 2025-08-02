@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
   const calendar = google.calendar({version:'v3', auth:oauthClient})
   const startDate = new Date().toDateString()
   try{
-  const response = await new Promise((resolve, reject) => {
+  const response: any = await new Promise((resolve, reject) => {
       calendar.events.list({
         calendarId:'primary',
         maxResults:100,
         singleEvents:true,
         timeZone: userTZ!,
         orderBy:'startTime',
-      }, (err: any, res: unknown) => {
+      }, (err: any, res: any) => {
         if (err) {
           reject(err);
         } else {
