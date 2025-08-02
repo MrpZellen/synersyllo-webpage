@@ -50,12 +50,10 @@ export default defineEventHandler(async (event) => {
               description: req?.eventDesc,
               summary: req.eventTitle,
               start: {
-                dateTime: new Date(req.startHour).toISOString(),
-                timeZone: 'UTC'
+                dateTime: new Date(req.startHour).toISOString()
               },
               end: {
-                dateTime: new Date(req.endHour).toISOString(),
-                timeZone: 'UTC'
+                dateTime: new Date(req.endHour).toISOString()
               },
               transparency: req?.transparency ?? 'opaque',
               status: req.status ?? 'tentative'
@@ -71,11 +69,9 @@ export default defineEventHandler(async (event) => {
               summary: req.eventTitle,
               start: {
                 dateTime: new Date(req.startHour).toISOString(),
-                timeZone: 'UTC'
               },
               end: {
-                dateTime: new Date(req.endHour).toISOString(),
-                timeZone: 'UTC'
+                dateTime: new Date(req.endHour).toISOString()
               },
               transparency: req?.transparency ?? 'opaque',
               status: req.status ?? 'tentative',
@@ -91,12 +87,10 @@ export default defineEventHandler(async (event) => {
               description: req?.eventDesc,
               summary: req.eventTitle,
               start: {
-                dateTime: new Date(req.startHour).toISOString(),
-                timeZone: 'UTC'
+                dateTime: new Date(req.startHour).toISOString()
               },
               end: {
-                dateTime: new Date(req.endHour).toISOString(),
-                timeZone: 'UTC'
+                dateTime: new Date(req.endHour).toISOString()
               },
               transparency: req?.transparency ?? 'opaque',
               status: req.status ?? 'tentative',

@@ -1,4 +1,5 @@
 <template>
+  <div v-if="!isLoading">
   <div v-if="!isValidLogin" class="text-red-500 flex flex-grow place-content-center items-center">
     <div class="text-start p-7 font-bold text-4xl flex flex-col">Sorry but you cannot access this page.
     <div class="text-start font-bold text-4xl"> This is due to one of the following: </div>
@@ -137,9 +138,10 @@
     </div>
     <div v-if="groupStorage" class="m-5 grid grid-cols-4 row-auto gap-4">
       <div v-for="(group) in groups">
-        <group-item class="p-5" :adminOfPage="String(admin)" :groupID="group.GID" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
+        <group-item class="p-5" :isAdmin="true" :adminOfPage="String(admin)" :groupID="group.GID" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -161,11 +163,6 @@ const testValues = await $fetch<{ cid: string, username: string }>((`/api/checkL
   }
 })
 const isValidLogin = ref(false)
-if (testValues.cid !== CID || testValues.username !== admin){
-  isValidLogin.value = false
-} else {
-  isValidLogin.value = true
-}
 
 var groupStorage = ref<GroupType[]>([])
 const groups = computed(() => groupStorage.value);
@@ -173,6 +170,9 @@ const groups = computed(() => groupStorage.value);
 const additionalSelection = ref(false)
 const openAddWindow = ref(false)
 const goodFields = ref(true)
+const isLoading = ref(true)
+
+
 const openWindow = () => {
   openAddWindow.value = true;
   console.log("hit");
@@ -282,7 +282,8 @@ const getGroup = async () => {
     }, 
     body: JSON.stringify({
       CID: CID,
-      admin: admin
+      admin: admin,
+      isAdmin: true
     })
   })
   if(res.status === 400){
@@ -336,6 +337,13 @@ const responseRemove = (ourCurrentSurveyNumber: number) => {
 onMounted(async () => {
   await getGroup()
   console.log('OUR GROUP STORED: ', groups, groups.value)
+  if (testValues.cid !== CID || testValues.username !== admin){
+    isValidLogin.value = false
+  } else {
+    isValidLogin.value = true
+  }
+
+  isLoading.value = false
 }) 
 </script>
 

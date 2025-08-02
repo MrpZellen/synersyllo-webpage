@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full h-full text-center border-2 border-black">
+  <div class="flex flex-col w-full h-full text-center bg-transparent border-2 border-black">
     <div class=" top-0 border-2 border-black">
     {{ dayTitle }}, (DATE HERE)
   </div>

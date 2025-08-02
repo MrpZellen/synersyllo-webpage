@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col content-center bg-funkygreen hover:border-synsyl-darkgreen border-6 border-transparent rounded">
+  <div v-if="isAdmin" class="flex flex-col content-center bg-funkygreen hover:border-synsyl-darkgreen border-6 border-transparent rounded">
     <div class="text-center p-1 font-bold text-3xl">{{props.title.replaceAll('-', ' ') ?? 'No Name Johns'}}</div>
     <div class="text-center p-1 font-bold text-2xl">GROUP LEAD: {{ finalLead }}</div>
     <div v-if="userList.length >= 1" class="text-center p-1 font-bold text-lg">Members: <span class="px-1 text-wrap text-lg" v-for="(item, index) in userList">
@@ -74,6 +74,16 @@
           </button>
       </div>
   </div>
+  <div v-if="!isAdmin" class="flex flex-col content-center bg-funkygreen hover:border-synsyl-darkgreen border-6 border-transparent rounded">
+    <div class="text-center p-1 font-bold text-3xl">{{props.title.replaceAll('-', ' ') ?? 'No Name Johns'}}</div>
+    <div class="text-center p-1 font-bold text-2xl">GROUP LEAD: {{ finalLead }}</div>
+    <div v-if="userList.length >= 1" class="text-center p-1 font-bold text-lg">Members: <span class="px-1 text-wrap text-lg" v-for="(item, index) in userList">
+      {{item}}<span v-if="index < userList.length - 1">, </span><!--DO NOT RENDER THE COMMA IF INDEX IS LESS THAN MAX-->
+    </span></div>
+    <div v-if="permittedRoles.length >= 1" class="text-center p-1 font-bold text-xl">Permitted Roles: <span class="px-1 text-wrap text-lg" v-for="(item, index) in permittedRoles">
+      {{item}}<span v-if="index < permittedRoles.length - 1">, </span><!--DO NOT RENDER THE COMMA IF INDEX IS LESS THAN MAX-->
+    </span></div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -84,6 +94,7 @@ const finalLead = ref('')
 
 //doing any due to data access
 const props = defineProps<{
+  isAdmin: boolean,
   adminOfPage: string,
   groupID: string,
   title: string,

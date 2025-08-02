@@ -1,4 +1,5 @@
 <template>
+  <div v-if="!isLoading" class="flex flex-col w-full">
   <div class=" text-center p-4 font-bold text-lg">What are your plans today, {{ username }}?</div>
   <div v-if="isAdmin" class="text-center p-4 font-bold text-xl">Signed in as Admin.</div>
   <div class="w-full">
@@ -90,6 +91,7 @@
     <keep-alive>
       <calendar-back
         @emit-final="retrieveBackData"
+        :hours-total="items.hoursTotal"
         :recall="menuClosed"
         :isInBG="isInBG"
         :title-of-calendar="items.titleOfCalendar"
@@ -106,13 +108,16 @@
   >
     Make A New Event
   </button>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { isValidObjectId } from 'mongoose';
 import * as z from 'zod';
 import type { Calendar } from '~/models/Calendar'
 
 const isAdmin = ref(false)
+const isLoading = ref(true)
 
 var myCookie = useCookie('google_tokens').value
 const menuClosed = ref(true)
@@ -137,6 +142,7 @@ const route = useRoute()
 var username = ref(route.params.user)
 //NEW CONCEPT: a reactive allows it to be changed post build
 const items = reactive({
+  hoursTotal: 0,
   titleOfCalendar: "",
   themeColor: "",
   userEmail: "",
@@ -190,11 +196,11 @@ const calcResult = (hour: number) => {
     min = "00";
   }
   if (hour < 12 && hour != 0) {
-    return hour + ":" + min + " AM";
+    return Math.floor(hour) + ":" + min + " AM";
   } else if (hour > 12) {
-    return (hour % 12) + ":" + min + " PM";
+    return Math.floor(hour % 12) + ":" + min + " PM";
   } else if (hour == 12) {
-    return hour + ":" + min + " PM";
+    return Math.floor(hour) + ":" + min + " PM";
   } else {
     return "12 AM";
   }
@@ -213,6 +219,7 @@ const buildCalendar = async () => {
     items.themeColor = result.calendars.backgroundColor;
     items.userEmail = result.calendars.id;
     items.daysPerWeek = 7;
+    items.hoursTotal = 24;
     console.log('ITEMS HERE!!!!  ', result)
   })
 };
@@ -260,6 +267,7 @@ const addEvent = async () => {
     })
   }).then(() => {
     backNew()
+    reloadNuxtApp()
   })
   } catch(error) {
     goodFields.value = false
@@ -296,6 +304,7 @@ onMounted(async () => {
   const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean }>('/api/checkLoginStatus')
   isAdmin.value = res.isAdmin
   console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin)
+  isLoading.value = false
   await buildCalendar();
 })
 </script>

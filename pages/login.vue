@@ -58,7 +58,7 @@ const submitLogin = async () => {
 
     const validatedUser = UserVal.parse(loginInfo.value)
     //ESTABLISH USER, PASS, and REGISTRATION:
-    const isRegistered = await $fetch(`/api/registerstatus/${id}`, {
+    const isRegistered = await $fetch(`/api/statusManagement/registerstatus/${id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -68,7 +68,7 @@ const submitLogin = async () => {
         state: id
       })
     })
-    const pass = await $fetch(`/api/passstatus/${id}`, {
+    const pass = await $fetch(`/api/statusManagement/passstatus/${id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -78,7 +78,7 @@ const submitLogin = async () => {
         state: id
       })
     })
-    const user = await $fetch(`/api/session/${id}`, {
+    const user = await $fetch(`/api/statusManagement/session/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ const submitLogin = async () => {
       user: loginInfo.value.username
     })
   })
-  const resultCID = await $fetch(`/api/cidstatus/${id}`, {
+  const resultCID = await $fetch(`/api/statusManagement/cidstatus/${id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
