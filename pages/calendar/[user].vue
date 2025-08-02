@@ -5,15 +5,15 @@
   <div class="w-full">
     <div
       v-if="openAddWindow == true"
-      class="absolute z-50 p-5 top-1/3 left-1/3 w-[400px] h-[500px] rounded-sm bg-blue-300 border-2 border-black shadow-lg"
+      class="absolute z-50 p-5 top-1/3 left-1/3 w-[440px] h-fit rounded-sm bg-blue-300 border-2 border-black shadow-lg"
      >
      <div v-if="!goodFields" class="text-red-500 text-md font-bold">please input all fields!</div>
       <div class="text-xl p-2">
-        Title: <input v-model="popOutValues.eventTitle" />
+        Title: <input class="bg-sky-100 rounded-md m-2 p-2" v-model="popOutValues.eventTitle" />
       </div>
       <div class="text-xl p-2">
         Description:
-        <textarea
+        <textarea class="bg-sky-100 rounded-md m-2 p-2"
           v-model="popOutValues.eventDesc"
           placeholder="enter desc..."
         />
@@ -21,18 +21,27 @@
       <div class="text-md p-2 flex flex-col">
         <div>
           Start Time:
-          <input type="datetime-local" v-model="popOutValues.startHour" />
+          <input class="bg-sky-100 rounded-md m-2 p-2" type="datetime-local" v-model="popOutValues.startHour" />
         </div>
         <div>
           End Time: 
-          <input type="datetime-local" v-model="popOutValues.endHour" />
+          <input class="bg-sky-100 rounded-md m-2 p-2" type="datetime-local" v-model="popOutValues.endHour" />
+        </div>
+      </div>
+      <div> Change Timezone?
+        <input type="checkbox" v-model="changeTimezone"/>
+        <div v-if="changeTimezone">
+          <div>
+          Timezone:
+          <v-select class="bg-sky-100 rounded-md m-2 p-2" :options="TZoptions" ></v-select>
+        </div>
         </div>
       </div>
       <div class="text-md p-2 flex flex-col">
         <div>Is It Recurring?
           <input type="checkbox" v-model="popOutValues.isRecurring"/>
           <div class="flex flex-col" v-if="popOutValues.isRecurring">
-            <div>What interval?
+            <div class="bg-sky-100 rounded-md m-2 p-2">What interval?
               Daily <input type="radio" name="recurring" value="daily" v-model="repetitionValues.interval" />
               Weekly <input type="radio" name="recurring" value="weekly" v-model="repetitionValues.interval" />
               Biweekly <input type="radio" name="recurring" value="biweekly" v-model="repetitionValues.interval" />
@@ -42,7 +51,7 @@
             <div>When should it end?
               Never <input type="checkbox" value="never" v-model="repetitionValues.endsOn" v-on:click="showEndMenu" />
               <div v-if="ends">
-                <input type="datetime-local" v-model="repetitionValues.endsOn" />
+                <input class="bg-sky-100 rounded-md m-2 p-2" type="datetime-local" v-model="repetitionValues.endsOn" />
               </div>
             </div>
           </div>
@@ -113,11 +122,14 @@
 
 <script setup lang="ts">
 import { isValidObjectId } from 'mongoose';
+import vSelect from 'vue-select';
 import * as z from 'zod';
 import type { Calendar } from '~/models/Calendar'
-
+import { TZoptions } from '~/models/TZoptions';
 const isAdmin = ref(false)
 const isLoading = ref(true)
+const changeTimezone = ref(false)
+
 
 var myCookie = useCookie('google_tokens').value
 const menuClosed = ref(true)
@@ -162,14 +174,16 @@ const popOutValues = ref<{
   eventDesc: string,
   startHour: number,
   endHour: number,
-  isRecurring: boolean
+  isRecurring: boolean,
+  timezone: string
 }>({
   eventID: '',
   eventTitle: '',
   eventDesc: '',
   startHour: 0,
   endHour: 0,
-  isRecurring: false
+  isRecurring: false,
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
 });
 var startHourCalc = "0 PM";
 var endHourCalc = "1 PM";

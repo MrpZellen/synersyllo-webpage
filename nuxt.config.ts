@@ -22,7 +22,10 @@ export default defineNuxtConfig({
     REDIRECT: process.env.NUXT_REDIRECT
   }, //unstorage definitions
   modules: [
-    'nuxt-mongoose',
+    'nuxt-mongoose'
+  ],
+  plugins: [
+    'vue-select'
   ],
   nitro: {
     storage: {

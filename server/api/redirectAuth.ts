@@ -105,7 +105,7 @@ export default defineEventHandler(async (event) => {
     if(successfulBountifulFortuneOfWorking){ //if login successful
       console.log('jolly good show')
       if(adminStatus){
-        setCookie(event, 'adminacc', JSON.stringify({isAdmin: true, cid: cid}), {
+        setCookie(event, 'adminacc', JSON.stringify({isAdmin: true, cid: cid, photo: yummyUserInformation.picture}), {
         httpOnly: true,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
@@ -114,7 +114,7 @@ export default defineEventHandler(async (event) => {
       });
       console.log('defined an admin mmyes')
       } else {
-        setCookie(event, 'adminacc', JSON.stringify({isAdmin: false, cid: cid}), {
+        setCookie(event, 'adminacc', JSON.stringify({isAdmin: false, cid: cid, photo: yummyUserInformation.picture}), {
         httpOnly: true,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',

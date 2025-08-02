@@ -7,13 +7,14 @@
     <header>
       <div class="flex flex-row justify-around items-center bg-blue-100">
         <div class="p-3 justify-items-center" @click="home">
-        <img src="/Logo.ico" class="w-15 h-15" /> <div class="text-lg font-bold">SynerSyllo</div> <span class="text-lg" v-if="isAdmin"> - Admin Signin</span> </div>
-        <div class="menuText" v-if="isLoggedIn" @click="myCalendar">My Calendar</div>
-        <div class="menuText" v-if="!isLoggedIn" @click="logIn">Login</div>
-        <div class="menuText" v-if="isLoggedIn" @click="logOut">Logout</div>
-        <div class="menuText" v-if="!isLoggedIn" @click="register">Register</div>
-        <div class="menuText" v-if="isAdmin && cid" @click="groups">Manage Company Groups</div>
-        <div class="menuText" v-if="isLoggedIn && cid" @click="userGroups">View Your Groups</div>
+        <img src="/Logo.ico" class="w-15 h-15" /> <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold text-lg font-bold">SynerSyllo</div> <span class="text-lg" v-if="isAdmin"> - Admin Signin</span> </div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn" @click="myCalendar">My Calendar</div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="!isLoggedIn" @click="logIn">Login</div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn" @click="logOut">Logout</div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="!isLoggedIn" @click="register">Register</div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isAdmin && cid" @click="groups">Manage Company Groups</div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn && cid" @click="userGroups">View Your Groups</div>
+        <div v-if="isLoggedIn" class="flex flex-end m-3"><img class="rounded-full border-5 border-transparent transition delay-50 duration-200 ease-in-out hover:scale-110 hover:border-blue-300 w-15 h-15" :src="photo" /></div>
       </div>
     </header>
     <main class="flex flex-grow">
@@ -34,6 +35,7 @@ const isLoggedIn = ref(false)
 const isAdmin = ref(false)
 const username = ref('')
 const cid = ref('')
+const photo = ref('')
 
 const isLoading = ref(true)
 
@@ -65,12 +67,13 @@ const userGroups = () => {
 }
 
 onMounted(async () => {
-  const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean, cid: string, username: string }>('/api/checkLoginStatus')
+  const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean, cid: string, username: string, photo: string }>('/api/checkLoginStatus')
   isLoggedIn.value = res.isLoggedIn
   isAdmin.value = res.isAdmin
   username.value = res.username
+  photo.value = res.photo
   cid.value = String(res.cid)
-  console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin, 'is cid', res.cid)
+  console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin, 'is cid', res.cid, 'is photo', res.photo)
   isLoading.value = false
 })
 </script>
