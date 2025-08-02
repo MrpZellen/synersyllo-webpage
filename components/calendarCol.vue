@@ -20,8 +20,8 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
   recall: boolean
   day: number,
   dayCount: number,
+  calendarTZ: string,
  }>();
-
 const recall = ref(props.recall)
 
  //date calculation
@@ -75,7 +75,16 @@ const recall = ref(props.recall)
   var eventInfo: CalendarEvent[];
   const getEventInfo = async () => {
     const result = await $fetch<{ events: CalendarEvent[] }>('/api/events/events', {
-      credentials: 'include'
+      credentials: 'include',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }, 
+      body: JSON.stringify({
+        userSettings: {
+          timezonePref: props.calendarTZ
+        }
+      })
     })
     console.log('OUR RESULT:', result)
     eventInfo = result.events
@@ -87,6 +96,8 @@ const recall = ref(props.recall)
  const validateList = async () => {
   console.log(eventInfo)
     if(eventInfo != null){
+
+console.log(props.calendarTZ, 'MYTZ')
   eventInfo.forEach(element => {
      var dateString = element.start.dateTime.substring(0, 10);
      let date = new Date(dateString)
@@ -95,19 +106,30 @@ const recall = ref(props.recall)
      //num math
      var startNumString = element.start.dateTime.substring(11, 13);
      var endNumString = element.end.dateTime.substring(11, 13);
-     //console.log('john test', startNumString, endNumString)
      var startNum = parseFloat(startNumString) + (parseFloat(element.start.dateTime.substring(14,16))/60)
      var endNum = parseFloat(endNumString) + (parseFloat(element.end.dateTime.substring(14,16))/60)
-     //console.log('better johns', startNum, endNum)
 
      var elementHour = Math.trunc(startNum) //truncates to a full number
-     var elementChunk = endNum - startNum
+     var elementChunk: number;
+     var isContinual = false
+     var finalChunk = 0
+     var extraDayCount = 0
+     if(endNum < startNum){
+        elementChunk = (endNum+24) - (startNum)
+     } else {
+        elementChunk = endNum - startNum
+     }
      if(date.getDay() == props.day){
       var newItem = {
         id: element.id,
         title: element.summary,
         hour: elementHour,
         chunk: elementChunk,
+        continual: isContinual,
+        continualInfo: {
+          extraDays: extraDayCount,
+          finalChunk: finalChunk
+        },
         desc: element.description
       }
       eventList.value.push(newItem)

@@ -7,7 +7,7 @@
     </div>
 
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
     </div>
   </div>
   <div v-else class="flex w-full min-h-dvh justify-center w-100 border-2 border-black">
@@ -19,7 +19,7 @@
 
     <div class="flex w-full min-h-dvh justify-center w-100 border-2 border-black blur-xs">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
     </div>
   </div>
   </div>
@@ -34,7 +34,8 @@
     themeColor: string,
     userEmail: string,
     daysPerWeek: number,
-    isInBG: boolean
+    isInBG: boolean,
+    calendarPref: string
   }>();
   const hoursArray = computed(() => Array.from({ length: props.hoursTotal }, (_, num) => num)) //value and num are the same, only one needed
   var dayCounted: number[] = []

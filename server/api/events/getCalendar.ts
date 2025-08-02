@@ -25,12 +25,12 @@ export default defineEventHandler(async (event) => {
   const response = await calendar.calendarList.list();
   const calendars = response?.data.items || [];
     return {
-      result: calendars[0],
+      calendars: calendars[0],
       status: 200
     };
 } catch (error) {
     return {
-      result: null,
+      calendars: null,
       status: 400
     }
 }

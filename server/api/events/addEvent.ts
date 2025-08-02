@@ -50,10 +50,12 @@ export default defineEventHandler(async (event) => {
               description: req?.eventDesc,
               summary: req.eventTitle,
               start: {
-                dateTime: new Date(req.startHour).toISOString()
+                dateTime: new Date(req.startHour).toISOString(),
+                timeZone: req.timezone,
               },
               end: {
-                dateTime: new Date(req.endHour).toISOString()
+                dateTime: new Date(req.endHour).toISOString(),
+                timeZone: req.timezone,
               },
               transparency: req?.transparency ?? 'opaque',
               status: req.status ?? 'tentative'
@@ -69,9 +71,11 @@ export default defineEventHandler(async (event) => {
               summary: req.eventTitle,
               start: {
                 dateTime: new Date(req.startHour).toISOString(),
+                timeZone: req.timezone,
               },
               end: {
-                dateTime: new Date(req.endHour).toISOString()
+                dateTime: new Date(req.endHour).toISOString(),
+                timeZone: req.timezone,
               },
               transparency: req?.transparency ?? 'opaque',
               status: req.status ?? 'tentative',
@@ -87,10 +91,12 @@ export default defineEventHandler(async (event) => {
               description: req?.eventDesc,
               summary: req.eventTitle,
               start: {
-                dateTime: new Date(req.startHour).toISOString()
+                dateTime: new Date(req.startHour).toISOString(),
+                timeZone: req.timezone,
               },
               end: {
-                dateTime: new Date(req.endHour).toISOString()
+                dateTime: new Date(req.endHour).toISOString(),
+                timeZone: req.timezone,
               },
               transparency: req?.transparency ?? 'opaque',
               status: req.status ?? 'tentative',

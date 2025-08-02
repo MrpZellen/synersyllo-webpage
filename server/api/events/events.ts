@@ -2,6 +2,8 @@ import {google} from 'googleapis'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
+  const req = await readBody(event)
+  const userSettings = req.userSettings
   const cookie = getCookie(event, 'google_tokens');
   if (!cookie){
     console.error('no cookie data')
@@ -10,6 +12,7 @@ export default defineEventHandler(async (event) => {
       status: 400
       } 
   }
+  var userTZ = userSettings.timezonePref
   const oauthClient = new google.auth.OAuth2(config.OAUTHID, config.OAUTHSECRET, config.REDIRECT)
   const tokens = JSON.parse(cookie);
   oauthClient.setCredentials(tokens);
@@ -21,8 +24,9 @@ export default defineEventHandler(async (event) => {
         calendarId:'primary',
         maxResults:100,
         singleEvents:true,
-        orderBy:'startTime'
-      }, (err, res) => {
+        timeZone: userTZ!,
+        orderBy:'startTime',
+      }, (err: any, res: unknown) => {
         if (err) {
           reject(err);
         } else {
@@ -30,7 +34,8 @@ export default defineEventHandler(async (event) => {
         }
       });
     });
-  const events = response?.data.items || [];
+    console.log(userTZ, ' TIMEZONE')
+  const events = response.data.items || [];
     return {
       events: events,
       status: 200

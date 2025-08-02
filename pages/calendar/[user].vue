@@ -100,6 +100,7 @@
     <keep-alive>
       <calendar-back
         @emit-final="retrieveBackData"
+        :calendar-pref="items.calendarPref"
         :hours-total="items.hoursTotal"
         :recall="menuClosed"
         :isInBG="isInBG"
@@ -159,6 +160,7 @@ const items = reactive({
   themeColor: "",
   userEmail: "",
   daysPerWeek: 7,
+  calendarPref: ''
 });
 const repetitionValues = ref<{
   interval: string,
@@ -221,8 +223,8 @@ const calcResult = (hour: number) => {
 };
 
 const buildCalendar = async () => {
-
-  const result = await $fetch<{ calendars: Calendar }>(`/api/calendar/${username}`, {
+  console.log('first we mine...')
+  const result = await $fetch<{ calendars: Calendar }>(`/api/events/getCalendar`, {
     credentials: 'include'
   }).then((result) => {
     if(!result){
@@ -232,6 +234,8 @@ const buildCalendar = async () => {
     items.titleOfCalendar = result.calendars.summary;
     items.themeColor = result.calendars.backgroundColor;
     items.userEmail = result.calendars.id;
+    items.calendarPref = result.calendars.timeZone;
+    console.log('TIMEZONE FROM SOURCE: ', items.calendarPref )
     items.daysPerWeek = 7;
     items.hoursTotal = 24;
     console.log('ITEMS HERE!!!!  ', result)
@@ -239,6 +243,15 @@ const buildCalendar = async () => {
 };
 
 const back = () => {
+  popOutValues.value = {
+  eventID: '',
+  eventTitle: '',
+  eventDesc: '',
+  startHour: 0,
+  endHour: 0,
+  isRecurring: false,
+  timezone: items.calendarPref
+  };
   menuClosed.value = false
   isInBG.value = false;
 };
@@ -272,6 +285,7 @@ const addEvent = async () => {
       eventDesc: popOutValues.value.eventDesc,
       startHour: popOutValues.value.startHour,
       endHour: popOutValues.value.endHour,
+      timezone: popOutValues.value.timezone,
       status: 'confirmed',
       recurrence: popOutValues.value.isRecurring ?? false,
       recurrenceItems: {
@@ -280,10 +294,12 @@ const addEvent = async () => {
       },
     })
   }).then(() => {
+    console.log('DID WE ADD EVENT?')
     backNew()
     reloadNuxtApp()
   })
   } catch(error) {
+    console.log('whybadevent?', error)
     goodFields.value = false
   }
 };
