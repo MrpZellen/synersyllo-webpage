@@ -1,0 +1,32 @@
+Include a note on every page stating that serious matters or concerns should be brought up to management or HR
+PAGE 1: Scheduling & Meetups {
+    Q: on a scale of 1-100, rate your scheduling overall. (100 is overscheduled and no time to do your work, 1 is no meetings or checkins, leading to massive confusion, 50 is perfect shceduling for you)
+    Q: Anything on your schedule that was unnessecary this week?
+    Q: Anything you wish you had more of on your schedule?
+    Q: From Heavily agree to Heavily disagree: The workload is balanced fairly between employees in your department.
+    Q: From Heavily agree to Heavily disagree: There are sufficient avenues to recieve assistance if I need it.
+    Q: From Heavily agree to Heavily disagree: Management has open times to meet with me when needed.
+    Q: From Heavily agree to Heavily disagree: I am comfortable with check-ins and I feel I can share my mind.
+    Q: Have your scheduling needs been met? Y/N
+    Q: Has your PTO been respected over the past 2 months (if relevant) Y/N
+    Q: Any Notes on scheduling and meetups?
+}
+PAGE 2: Work/Life Balance {
+    Q: From Heavily agree to Heavily disagree: My work doesn't encroach on my time at home.
+    Q: Recount this past week's experiences at work, and if they effected your time at home.
+    Q: MULTIPLE CHOICE: How many breaks did you get this week? (none; a few; a good amount; a lot)
+    Q: Do you have Remote or Hybrid Work? Y/N
+    IF YES TO REMOTE/HYBRID {
+        Q: How engaged are you in virtual meetings (On a scale from 1-10)?
+        Q: Is there any way you would like meetings to be improved?
+        Q: Do you feel heard by management (On a scale from 1-10)?
+        Q: From Heavily agree to Heavily disagree: Management replies to my messages in a timely manner.
+        Q: Is there anything you would like to add about Remote Or Hybrid work?
+    }
+    Q: On a scale of 1-10, how often do you reach out for help with something?
+    Q: Anything you would like to add as notes?
+}
+PAGE 3: Company & Group Specifics {
+    These are random specific items that aren't defined yet, and are read from an api calling the company data, don't fill this part in, just define the page.
+}
+

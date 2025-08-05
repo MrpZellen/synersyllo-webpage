@@ -43,6 +43,9 @@ export default defineEventHandler(async (event) => {
     };
 } catch (error) {
   console.log('WHATWENTWRONG', error)
+  if(error){
+    $fetch(`/api/accessUser/logout`)
+  }
     return {
       events: null,
       status: 400

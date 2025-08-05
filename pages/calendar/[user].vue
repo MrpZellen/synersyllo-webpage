@@ -193,7 +193,7 @@ const showEndMenu = () => {
 }
 
 const surveyRedirect = () => {
-  navigateTo(`/bob/${username}`)
+  navigateTo(`/bob/${username.value}`)
 }
 
 const pageUp = async (isUp: boolean) => {
