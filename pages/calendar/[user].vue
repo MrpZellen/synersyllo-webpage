@@ -97,7 +97,10 @@
         </div>
       </div>
     </div>
-    <div v-if="pageIndicator > 0">Button 1</div>
+    <div class="content-center" @mouseover="leftButtonShown = true" @mouseleave="leftButtonShown = false" @click="pageUp(false)">
+      <img class="h-10/12" v-if="!leftButtonShown" src="/assets/icons/arrows/leftArrowDeactive.png" />
+      <img class="h-10/12 " v-if="leftButtonShown" src="/assets/icons/arrows/leftArrowActive.png" />
+    </div>
     <keep-alive>
       <div class="w-full justify-center flex flex-row">
       <div class="content-end">
@@ -134,7 +137,10 @@
       </div>
       </div>
     </keep-alive>
-    <div>Button 2</div>
+    <div class="content-center" @mouseover="rightButtonShown = true"  @mouseleave="rightButtonShown = false" @click="pageUp(true)">
+      <img class="h-10/12 " v-if="!rightButtonShown" src="/assets/icons/arrows/rightArrowDeactive.png" />
+      <img class="h-10/12 " v-if="rightButtonShown" src="/assets/icons/arrows/rightArrowActive.png" />
+    </div>
   </div>
   <button
     v-if="isInBG == false"
@@ -152,10 +158,17 @@ import vSelect from 'vue-select';
 import * as z from 'zod';
 import type { Calendar } from '~/models/Calendar'
 import { TZoptions } from '~/models/TZoptions';
+import { getData, setData } from 'nuxt-storage/local-storage';
+//get user
+const route = useRoute()
+var username = ref(route.params.user)
+
 const isAdmin = ref(false)
 const isLoading = ref(true)
 const changeTimezone = ref(false)
-const pageIndicator = ref(0)
+const pageIndicator = ref(getData(String(username)) ?? 0)
+const leftButtonShown = ref(false)
+const rightButtonShown = ref(false)
 
 
 var myCookie = useCookie('google_tokens').value
@@ -176,9 +189,20 @@ const ends = ref(true)
 const showEndMenu = () => {
   ends.value = !ends.value
 }
-//get user
-const route = useRoute()
-var username = ref(route.params.user)
+
+const pageUp = async (isUp: boolean) => {
+  console.log('paging up! ', isUp)
+  let res = await getData(String(username))
+  if(isUp){
+    await setData(String(username), (res + 1))
+  } else {
+    await setData(String(username), (res - 1))
+  }
+  reloadNuxtApp({
+    ttl: 100,
+    force: true,
+  })
+}
 //NEW CONCEPT: a reactive allows it to be changed post build
 const items = reactive({
   hoursTotal: 0,
@@ -244,7 +268,7 @@ const calcResult = (hour: number) => {
     return Math.floor(hour) + ":" + min + " AM";
   } else if (hour > 12 && hour < 24) {
     return Math.floor(hour % 12) + ":" + min + " PM";
-  } else if (hour == 12) {
+  } else if (hour >= 12 && hour < 13) {
     return Math.floor(hour) + ":" + min + " PM";
   } else if ((hour > 24 && hour < 25) ||(hour > 0 && hour < 1)) {
     return "12:" + min + " AM";

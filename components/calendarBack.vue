@@ -43,8 +43,14 @@
     var dayToUseINATOR = new Date()
     //FIRST, GET SUNDAY
     dayToUseINATOR = gimmeSunday(dayToUseINATOR) //turns it into the closest sunday
-    for(var i = (currentpage.value); i > 0; i--){
-      dayToUseINATOR.setDate(dayToUseINATOR.getDate() + props.daysPerWeek)
+    if(currentpage.value >= 0){
+      for(var i = (currentpage.value); i > 0; i--){
+        dayToUseINATOR.setDate(dayToUseINATOR.getDate() + props.daysPerWeek)
+      }
+    } else {
+      for(var i = (currentpage.value); i < 0; i++){
+        dayToUseINATOR.setDate(dayToUseINATOR.getDate() - props.daysPerWeek)
+      }
     }
     //now we have set it to the sunday of the proper week
     return dayToUseINATOR

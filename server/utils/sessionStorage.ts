@@ -15,6 +15,9 @@ function cidKey(id: string) {
 function adminKey(id: string) {
   return `admin:${id}`;
 }
+function pageKey(id: string) {
+  return `page:${id}`;
+}
 
 //SET AND GET USER
 export async function setUser(stateId: string, user: string){
@@ -82,5 +85,19 @@ export const getAdmin = async (stateId: string) => {
 export async function killAdmin(stateId: string){
   const storage = useStorage();
   storage.removeItem(adminKey(stateId))
+}
+
+//SET AND GET PAGE
+export async function setPage(stateId: string, page: number){
+  const storage = useStorage();
+  await storage.setItem(pageKey(stateId), page)
+}
+export const getPage = async (stateId: string) => {
+  const storage = useStorage();
+  return await storage.getItem(pageKey(stateId))
+}
+export async function killPage(stateId: string){
+  const storage = useStorage();
+  storage.removeItem(pageKey(stateId))
 }
 //TODO: redefine as an item?

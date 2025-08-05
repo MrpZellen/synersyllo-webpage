@@ -90,13 +90,16 @@ const recall = ref(props.recall)
  const eventList = ref<{id: string, title: string, hour: number; chunk: number, desc: string}[]>([])
  const validateList = async () => {
   console.log(eventInfo)
+
+  let propsDate = new Date(props.day.toISOString().substring(0, 10))
     if(eventInfo != null){
 
 console.log(props.calendarTZ, 'MYTZ')
   eventInfo.forEach(element => {
      var dateString = element.start.dateTime.substring(0, 10);
      let date = new Date(dateString)
-     //console.log('date string', dateString)
+     console.log('date string', date)
+     console.log('my dateInput', propsDate)
      //console.log('date test', date)
      //num math
      var startNumString = element.start.dateTime.substring(11, 13);
@@ -114,7 +117,7 @@ console.log(props.calendarTZ, 'MYTZ')
      } else {
         elementChunk = endNum - startNum
      }
-     if(date === props.day){
+     if(date.toString() === propsDate.toString()){
       var newItem = {
         id: element.id,
         title: element.summary,
