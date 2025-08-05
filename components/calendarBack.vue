@@ -1,13 +1,13 @@
 <template>
   <div v-if="!props.isInBG" class="flex w-full min-h-dvh justify-center w-100 border-2 border-black bg-transparent">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :day-string="calculateDay(index).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(index)" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :day-string="calculateDay(day+1).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(day)" :key="index" :recall="props.recall"/>
     </div>
   </div>
   <div v-else class="flex w-full min-h-dvh justify-center w-100 border-2 border-black bg-transparent">
     <div class="flex w-full min-h-dvh justify-center w-100 border-2 border-black blur-xs">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :dayString="calculateDay(index).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(index)" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :dayString="calculateDay(day+1).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(day)" :key="index" :recall="props.recall"/>
     </div>
   </div>
   </div>
@@ -42,22 +42,24 @@
   const theFuturisticPagINATOR = () => {
     var dayToUseINATOR = new Date()
     //FIRST, GET SUNDAY
-    dayToUseINATOR = gimmeSunday(dayToUseINATOR) //turns it into the closest sunday
+    const sunday = gimmeSunday(dayToUseINATOR) //turns it into the closest sunday
+    const result = new Date(sunday)
     if(currentpage.value >= 0){
       for(var i = (currentpage.value); i > 0; i--){
-        dayToUseINATOR.setDate(dayToUseINATOR.getDate() + props.daysPerWeek)
+        result.setDate(result.getDate() + props.daysPerWeek)
       }
     } else {
       for(var i = (currentpage.value); i < 0; i++){
-        dayToUseINATOR.setDate(dayToUseINATOR.getDate() - props.daysPerWeek)
+        result.setDate(result.getDate() - props.daysPerWeek)
       }
     }
     //now we have set it to the sunday of the proper week
-    return dayToUseINATOR
+    return result
     }
 
   const calculateDay = (index: number): Date => {
-    var returnedDay = theFuturisticPagINATOR()
+    const baseDay = theFuturisticPagINATOR();
+    var returnedDay = new Date(baseDay)
     for(var i = index; i > 0; i--){
       returnedDay.setDate(returnedDay.getDate() + 1)
     }

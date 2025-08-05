@@ -13,95 +13,18 @@ import 'survey-core/survey-core.css';
 
 const surveyModel = {
   pages: [{
-    title: 'Company Info',
-    elements: [
-    {
-      name: "companyInfo_name",
-      title: "What's the name of your company?",
-      type: 'text',
-      isRequired: true
-    },
-    {
-      name: "companyInfo_industry",
-      title: "What industry is your company in?",
-      type: "dropdown",
-      choices: industryDropdownChoices,
-      showNoneItem: true,
-      showOtherItem: true,
-      isRequired: true
-    },
-    {
-      name: "companyInfo_size",
-      title: "How many people are in your company?",
-      type: "text",
-      inputType: "number",
-      min: 1,
-      isRequired: true
-    }, 
-    {
-      name: "website",
-      title: "What is your company website?",
-      type: "text",
-      inputType: "url"
-    }
-  ]}, {
-    title: 'Company Location',
-   elements: [
-    {
-      name: "companyInfo_localization_city",
-      title: "Which city is your company based in?",
-      type: "text"
-    },
-    {
-      name: "companyInfo_localization_state",
-      title: "Which state is your company based in? (optional)",
-      type: "text"
-    },
-    {
-      name: "companyInfo_localization_postzip",
-      title: "ZIP or postal code?",
-      type: "text",
-      inputType: "text"
-    },
-    {
-      name: "companyInfo_localization_timezone",
-      title: "Your company’s time zone (e.g. EST, PST)?",
-      type: "text"
-    }
-   ]}, {
-    title: 'Bob Details',
-   elements: [
-    {
-      name: "bobInfo_specifications_tone",
-      title: "Describe BOB's tone",
-      type: "text",
-      description: "Example: serious, corporate family, parody, etc."
-    },
-    {
-      name: "bobInfo_specifications_description",
-      title: "How descriptive should BOB be? (1–10)",
-      type: "rating",
-      rateMin: 1,
-      rateMax: 10,
-      minRateDescription: "Very brief",
-      maxRateDescription: "Very detailed"
-    },
-    {
-      name: "bobInfo_specifications_avoid",
-      title: "What phrases or behaviors should BOB avoid?",
-      type: "comment",
-      description: "List anything BOB should never say or do (comma or line separated)"
-    }
-   ]
-  }, {
-    title: 'Company Roles',
-    elements: [
+      title: 'Scheduling & Meetups',
+      elements: [
       {
-      name: "companyRoles",
-      title: "What are the roles in your company? (these will start as your groups!)",
-      type: "comment",
-      description: `List any role at your company, separate by commas! By default, you will have the roles "user" and "admin"`
-    }
+        name: "overall-satisfaction",
+        title: "On a scale of 1-100, rate your scheduling this week overall. (Be honest!)",
+        type: 'slider',
+        isRequired: false
+      },
+      {
+        name: 'meeting-frequency',
+        title: ""
+      }
     ]
   }]
 }

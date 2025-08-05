@@ -2,6 +2,7 @@
   <div v-if="!isLoading" class="flex flex-col w-full h-full">
   <div class=" text-center p-4 font-bold text-lg">What are your plans today, {{ username }}?</div>
   <div v-if="isAdmin" class="text-center p-4 font-bold text-xl">Signed in as Admin.</div>
+  <div v-if="surveyReady" @click="surveyRedirect" class="p-2 text-center hover:text-funkygreen font-bold text-lg text-synsyl-darkgreen animate-bounce">You have a survey ready! Click here to take it!!</div>
   <div class="w-full flex justify-center bg-transparent h-full">
     <div
       v-if="openAddWindow == true"
@@ -145,7 +146,7 @@
   <button
     v-if="isInBG == false"
     @click="openWindow"
-    class="px-4 content-center w-1/2 py-2 m-3 bg-funkygreen text-white rounded hover:bg-darkfunk font-bold"
+    class="px-4 content-center self-center w-1/2 py-2 m-5 bg-funkygreen text-white rounded hover:bg-darkfunk font-bold"
   >
     Make A New Event
   </button>
@@ -163,6 +164,7 @@ import { getData, setData } from 'nuxt-storage/local-storage';
 const route = useRoute()
 var username = ref(route.params.user)
 
+const surveyReady = ref(true)
 const isAdmin = ref(false)
 const isLoading = ref(true)
 const changeTimezone = ref(false)
@@ -188,6 +190,10 @@ const openWindow = () => {
 const ends = ref(true)
 const showEndMenu = () => {
   ends.value = !ends.value
+}
+
+const surveyRedirect = () => {
+  navigateTo(`/bob/${username}`)
 }
 
 const pageUp = async (isUp: boolean) => {

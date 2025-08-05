@@ -14,7 +14,6 @@
 <script lang="ts" setup>
 import type { CalendarEvent } from '~/models/CalendarEvent';
 
-
  const emitResult = defineEmits(['sendToBack'])
  const props = defineProps<{
   recall: boolean
@@ -23,10 +22,10 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
   calendarTZ: string,
   dayString: string
  }>();
+ console.log('MY DAY IS ' + props.day)
 const recall = ref(props.recall)
 
  //date calculation
- const page = 1;
  const dateCall = (num: number) => {
   var dayItem = 'WHA'
   switch (num) {
@@ -91,15 +90,12 @@ const recall = ref(props.recall)
  const validateList = async () => {
   console.log(eventInfo)
 
-  let propsDate = new Date(props.day.toISOString().substring(0, 10))
     if(eventInfo != null){
 
 console.log(props.calendarTZ, 'MYTZ')
   eventInfo.forEach(element => {
      var dateString = element.start.dateTime.substring(0, 10);
-     let date = new Date(dateString)
-     console.log('date string', date)
-     console.log('my dateInput', propsDate)
+     var same = sameDay(new Date(dateString), props.day)
      //console.log('date test', date)
      //num math
      var startNumString = element.start.dateTime.substring(11, 13);
@@ -117,7 +113,7 @@ console.log(props.calendarTZ, 'MYTZ')
      } else {
         elementChunk = endNum - startNum
      }
-     if(date.toString() === propsDate.toString()){
+     if(same){
       var newItem = {
         id: element.id,
         title: element.summary,
@@ -136,6 +132,14 @@ console.log(props.calendarTZ, 'MYTZ')
     }
     console.log('EVENTS ON ' + props.day, eventList.value)
  }
+
+ const sameDay = (date1: Date, date2: Date) => {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+};
  onMounted(() => {
     getEventInfo()
 })
