@@ -1,8 +1,8 @@
 <template>
-  <div v-if="!isLoading" class="flex flex-col w-full">
+  <div v-if="!isLoading" class="flex flex-col w-full h-full">
   <div class=" text-center p-4 font-bold text-lg">What are your plans today, {{ username }}?</div>
   <div v-if="isAdmin" class="text-center p-4 font-bold text-xl">Signed in as Admin.</div>
-  <div class="w-full">
+  <div class="w-full flex justify-center bg-transparent h-full">
     <div
       v-if="openAddWindow == true"
       class="absolute z-50 p-5 top-1/3 left-1/3 w-[440px] h-fit rounded-sm bg-blue-300 border-2 border-black shadow-lg"
@@ -97,8 +97,29 @@
         </div>
       </div>
     </div>
+    <div v-if="pageIndicator > 0">Button 1</div>
     <keep-alive>
-      <calendar-back
+      <div class="w-full justify-center flex flex-row">
+      <div class="content-end">
+        <div class="grid h-23/24 text-center pl-2 ml-2 pr-2 mr-2 font-bold" :style="{ gridTemplateRows: `repeat(${items.hoursTotal-1}, 1fr)` }">
+          <div v-for="hour in hoursArray" :key="hour" class="flex flex-grow h-full ">
+            <div v-if="hour == 0">12 AM</div>
+            <div v-if="hour < 12 && hour > 0">{{ hour }} AM</div>
+            <div v-if="hour == 12">12 PM</div>
+            <div v-if="hour > 12 && hour < 24">{{ hour - 12 }} PM</div>
+            <div v-if="hour == 24">12 AM</div>
+          </div>
+        </div>
+      </div>
+      <div class="w-11/12 relative z-10 h-full">
+        <div class="absolute z-0 inset-0 content-end">
+        <div class="grid h-23/24" :style="{ gridTemplateRows: `repeat(${items.hoursTotal-1}, 1fr)` }">
+          <div v-for="hour in hoursArray" :key="hour" class="flex flex-grow h-full">
+            <hr class="border-black/60 border-b-2 w-full" />
+          </div>
+        </div>
+     </div>
+        <calendar-back class="relative z-20"
         @emit-final="retrieveBackData"
         :calendar-pref="items.calendarPref"
         :hours-total="items.hoursTotal"
@@ -108,8 +129,12 @@
         :theme-color="items.themeColor"
         :user-email="items.userEmail"
         :days-per-week="7"
+        :page-count="pageIndicator"
       />
+      </div>
+      </div>
     </keep-alive>
+    <div>Button 2</div>
   </div>
   <button
     v-if="isInBG == false"
@@ -130,6 +155,7 @@ import { TZoptions } from '~/models/TZoptions';
 const isAdmin = ref(false)
 const isLoading = ref(true)
 const changeTimezone = ref(false)
+const pageIndicator = ref(0)
 
 
 var myCookie = useCookie('google_tokens').value
@@ -162,6 +188,9 @@ const items = reactive({
   daysPerWeek: 7,
   calendarPref: ''
 });
+const hoursArray = computed(() => Array.from({ length: items.hoursTotal }, (_, num) => num)) //value and num are the same, only one needed
+
+
 const repetitionValues = ref<{
   interval: string,
   endsOn: string,
@@ -211,12 +240,16 @@ const calcResult = (hour: number) => {
   if (min == "0") {
     min = "00";
   }
-  if (hour < 12 && hour != 0) {
+  if (hour < 12 && hour > 1) {
     return Math.floor(hour) + ":" + min + " AM";
-  } else if (hour > 12) {
+  } else if (hour > 12 && hour < 24) {
     return Math.floor(hour % 12) + ":" + min + " PM";
   } else if (hour == 12) {
     return Math.floor(hour) + ":" + min + " PM";
+  } else if ((hour > 24 && hour < 25) ||(hour > 0 && hour < 1)) {
+    return "12:" + min + " AM";
+  } else if(hour >= 25) {
+    return Math.floor(hour-24) + ":" + min + " AM";
   } else {
     return "12 AM";
   }
@@ -237,7 +270,7 @@ const buildCalendar = async () => {
     items.calendarPref = result.calendars.timeZone;
     console.log('TIMEZONE FROM SOURCE: ', items.calendarPref )
     items.daysPerWeek = 7;
-    items.hoursTotal = 24;
+    items.hoursTotal = 24 + 1;
     console.log('ITEMS HERE!!!!  ', result)
   })
 };

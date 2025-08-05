@@ -1,25 +1,13 @@
 <template>
-  <div v-if="!props.isInBG" class="flex w-full min-h-dvh justify-center w-100 border-2 border-black">
-    <div class="grid h-full min-h-dvh" :style="{ gridTemplateRows: `repeat(${hoursTotal}, 1fr)` }">
-      <div v-for="hour in hoursArray" :key="hour" class="flex items-center">
-        <hr class="border-gray-300 border-t-2 w-full" />
-      </div>
-    </div>
-
+  <div v-if="!props.isInBG" class="flex w-full min-h-dvh justify-center w-100 border-2 border-black bg-transparent">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :day-string="calculateDay(index).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(index)" :key="index" :recall="props.recall"/>
     </div>
   </div>
-  <div v-else class="flex w-full min-h-dvh justify-center w-100 border-2 border-black">
-    <div class="grid h-full min-h-dvh" :style="{ gridTemplateRows: `repeat(${hoursTotal}, 1fr)` }">
-      <div v-for="hour in hoursArray" :key="hour" class="flex items-center">
-        <hr class="border-gray-300 border-t-2 w-full" />
-      </div>
-    </div>
-
+  <div v-else class="flex w-full min-h-dvh justify-center w-100 border-2 border-black bg-transparent">
     <div class="flex w-full min-h-dvh justify-center w-100 border-2 border-black blur-xs">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="day" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :dayString="calculateDay(index).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(index)" :key="index" :recall="props.recall"/>
     </div>
   </div>
   </div>
@@ -35,9 +23,41 @@
     userEmail: string,
     daysPerWeek: number,
     isInBG: boolean,
-    calendarPref: string
+    calendarPref: string,
+    pageCount: number
   }>();
-  const hoursArray = computed(() => Array.from({ length: props.hoursTotal }, (_, num) => num)) //value and num are the same, only one needed
+  const currentpage = ref(props.pageCount);
+  const gimmeSunday = (notSunday: Date) => {
+  //first, find sunday
+  for(var i = notSunday.getDay(); i > 0; i--){
+    notSunday.setDate(notSunday.getDate() - 1) //sends back a day.
+  }
+  if(notSunday.getDay() !== 0){
+    console.log('DAY MATH WRONG FIX IT', notSunday.getDay())
+    return notSunday
+  } else {
+    return notSunday
+  }
+ }
+  const theFuturisticPagINATOR = () => {
+    var dayToUseINATOR = new Date()
+    //FIRST, GET SUNDAY
+    dayToUseINATOR = gimmeSunday(dayToUseINATOR) //turns it into the closest sunday
+    for(var i = (currentpage.value); i > 0; i--){
+      dayToUseINATOR.setDate(dayToUseINATOR.getDate() + props.daysPerWeek)
+    }
+    //now we have set it to the sunday of the proper week
+    return dayToUseINATOR
+    }
+
+  const calculateDay = (index: number): Date => {
+    var returnedDay = theFuturisticPagINATOR()
+    for(var i = index; i > 0; i--){
+      returnedDay.setDate(returnedDay.getDate() + 1)
+    }
+    return returnedDay
+  }
+
   var dayCounted: number[] = []
   if(props.daysPerWeek == 5){
     dayCounted = [1, 2, 3, 4, 5]
@@ -51,6 +71,35 @@
     emitToMain('emitFinal', payload)
     console.log('emitted full!')
   }
+
+  const dateCall = (num: number) => {
+    var dayItem = 'WHA'
+    switch (num) {
+    case 0:
+      dayItem = 'SUN'
+      break;
+    case 1:
+      dayItem = 'MON'
+      break;
+    case 2:
+      dayItem = 'TUE'
+      break;
+    case 3:
+      dayItem = 'WED'
+      break;
+    case 4:
+      dayItem = 'THU'
+      break;
+    case 5:
+      dayItem = 'FRI'
+      break;
+    case 6:
+      dayItem = 'SAT'
+      break;
+  }
+  return dayItem
+  }
+
 
 </script>
 

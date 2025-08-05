@@ -1,6 +1,6 @@
 <template>
   <div @click="optionMenu" class="flex p-3 transition delay-100 duration-300 ease-in-out bg-synsyl-lightblue/50 ml-2 mr-2 border-transparent border-3 
-  hover:border-blue-200 hover:scale-105 hover:bg-blue-300/75 rounded-md absolute"
+  hover:border-blue-200 hover:scale-105 hover:z-100 hover:bg-blue-300/75 rounded-md absolute"
   :style="{height: `calc(${(props.chunk!) /  props.hoursShown! * 100}%)`,
   width: `90%`,
   top: `calc(${(((props.hour!)+(0.1))*100)/props.hoursShown!}%)`

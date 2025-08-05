@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col w-full h-full text-center bg-transparent border-2 border-black">
-    <div class=" top-0 border-2 border-black">
-    {{ dayTitle }}, (DATE HERE)
+    <div class="h-1/24 top-0 border-2 border-black">
+    {{ props.dayString }}
   </div>
     <div class="flex-1 relative items-stretch justify-items-stretch">
       <div v-for="(event, index) in eventList" :key="index">
@@ -18,9 +18,10 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
  const emitResult = defineEmits(['sendToBack'])
  const props = defineProps<{
   recall: boolean
-  day: number,
+  day: Date,
   dayCount: number,
   calendarTZ: string,
+  dayString: string
  }>();
 const recall = ref(props.recall)
 
@@ -53,15 +54,8 @@ const recall = ref(props.recall)
  }
  return dayItem
  }
- var currentDay = new Date()
- var dayTitle = dateCall(props.day)
- const getDateRelation = () => {
-  var day = currentDay.getDay()
-  var currentMD = currentDay.toDateString()
-  var currentDayNum = parseInt(currentMD.substring(8, 10))
-  var currentMonNum = currentMD.substring(4, 7)
-  var currentYearNum = parseInt(currentMD.substring(11))
- }
+
+ 
  //var shownDate;
  //week and extra calendar support for future
 
@@ -70,6 +64,7 @@ const recall = ref(props.recall)
    emitResult('sendToBack', payload)
    console.log(payload)
  }
+ 
 
  //handling event API info
   var eventInfo: CalendarEvent[];
@@ -119,7 +114,7 @@ console.log(props.calendarTZ, 'MYTZ')
      } else {
         elementChunk = endNum - startNum
      }
-     if(date.getDay() == props.day){
+     if(date === props.day){
       var newItem = {
         id: element.id,
         title: element.summary,
@@ -136,6 +131,7 @@ console.log(props.calendarTZ, 'MYTZ')
      }
   });
     }
+    console.log('EVENTS ON ' + props.day, eventList.value)
  }
  onMounted(() => {
     getEventInfo()
