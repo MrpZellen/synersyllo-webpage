@@ -138,7 +138,7 @@
     </div>
     <div v-if="groupStorage" class="m-5 grid grid-cols-4 row-auto gap-4">
       <div v-for="(group) in groups">
-        <group-item class="p-5" :isAdmin="true" :adminOfPage="String(admin)" :groupID="group.GID" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
+        <group-item class="p-5" :currentSurveyItems="group.surveyAdditions" :isAdmin="true" :adminOfPage="String(admin)" :groupID="group.GID" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
       </div>
     </div>
   </div>

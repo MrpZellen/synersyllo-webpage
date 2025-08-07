@@ -24,6 +24,7 @@ type usergroupType = {
   GID: string
 }
 
+const totalItemCount = ref(0)
 const surveyReady = ref(false)
 const isLoaded = ref(false)
 let userSurveyData: UserType;
@@ -219,6 +220,10 @@ const companyReturn = async (results: any) => {
 
 const defineSurveySchema = async (survey: any) => {
   console.log(survey.data)
+  const structureSpecifics: any = {}
+  for(var i = totalItemCount.value; i > 0; i--){
+    structureSpecifics[`customItem${i}`] = survey.data[`customField${i}`];
+  }
   const structuredOutput = {
     schedulingMeetups: {
       schedulingRating: survey.data.scheduling_rating,
@@ -247,7 +252,7 @@ const defineSurveySchema = async (survey: any) => {
       helpSeekingFrequency: survey.data.help_seeking_frequency,
       worklifeNotes: survey.data.worklife_notes
     },
-    companySpecific: userSpecifics
+    companySpecific: structureSpecifics
   };
   const sentToFast = await $fetch(`/api/sendToBob`, {
     method: 'POST',
@@ -285,6 +290,7 @@ const checkSurvey = async () => {
 }
 
 const generateNewSurveyReplies = async () => {
+  let itemsTotal = 0
   try{
     let johnArray = userSurveyData.employeeData.groups!
     let myGroups: usergroupType[] = [];
@@ -303,7 +309,6 @@ const generateNewSurveyReplies = async () => {
       var surveyAdditions: GroupType[] = await surveyReplyRetrieval(extraGroups)
       if(surveyAdditions){
         let constructorUserSpef: any[] = []
-        let itemsTotal = 0
         console.log('survey stuff exists: ', surveyAdditions)
         surveyAdditions.forEach(element => {
           if(element.surveyAdditions){
@@ -342,13 +347,19 @@ const generateNewSurveyReplies = async () => {
                   "placeholder": 'answer here....'
                 }
               }
+              constructorUserSpef.concat(addItem)
             });
           }
         });
+        userSpecifics.value = constructorUserSpef
+      } else { //we have no survey additions
+        userSpecifics.value = []
       }
     }
+    return itemsTotal
   }catch(error){
     console.error(error)
+    return itemsTotal
   }
 }
 
@@ -378,7 +389,7 @@ const surveyReplyRetrieval = async (groups: usergroupType[]) => {
 onMounted(async () => {
   await checkSurvey()
   //NOW WE HAVE USER DATA, ACCESS RELEVANT DATA
-  await generateNewSurveyReplies()
+  totalItemCount.value = await generateNewSurveyReplies()
   isLoaded.value = true
 })
 </script>
