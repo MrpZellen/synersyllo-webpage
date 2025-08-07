@@ -51,7 +51,8 @@ export default defineEventHandler(async (event): Promise<any> => {
       },
       employeeData: {
         role: finalRole,
-        isAdmin: finalAdmin
+        isAdmin: finalAdmin,
+        availableSurvey: false
       }
     })
     console.log('user added')

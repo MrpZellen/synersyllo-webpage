@@ -158,13 +158,13 @@ import { isValidObjectId } from 'mongoose';
 import vSelect from 'vue-select';
 import * as z from 'zod';
 import type { Calendar } from '~/models/Calendar'
+import type { UserType } from '~/models/UserType';
 import { TZoptions } from '~/models/TZoptions';
 import { getData, setData } from 'nuxt-storage/local-storage';
 //get user
 const route = useRoute()
 var username = ref(route.params.user)
 
-const surveyReady = ref(true)
 const isAdmin = ref(false)
 const isLoading = ref(true)
 const changeTimezone = ref(false)
@@ -251,6 +251,9 @@ var endHourCalc = "1 PM";
 
 //change state on bg render
 const isInBG = ref(false);
+//change showcase of survey options
+const surveyReady = ref(false)
+
 
 
 //EMIT HANDLES
@@ -287,10 +290,11 @@ const calcResult = (hour: number) => {
 
 const buildCalendar = async () => {
   console.log('first we mine...')
-  const result = await $fetch<{ calendars: Calendar }>(`/api/events/getCalendar`, {
+  const result = await $fetch<{ calendars: Calendar, status: number }>(`/api/events/getCalendar`, {
     credentials: 'include'
   }).then((result) => {
-    if(!result){
+    if(result.status == 400){
+      navigateTo('/logout')
       console.error('not signed in!')
       //error page handling
     }
@@ -390,6 +394,27 @@ const removeEvent = async () => {
   }
 };
 
+const checkSurvey = async () => {
+  try{
+    const response = await $fetch<{ status: number, info: UserType }>('/api/accessUser/getUserByUsername', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username.value
+      })
+    })
+    if(response.status == 200){
+      surveyReady.value = response.info.employeeData.availableSurvey
+      console.log('surveyValue: ', surveyReady.value)
+    }
+  }catch(error){
+    console.error('FAILED TO RETRIEVE SURVEY STATUS', error)
+    navigateTo('/logout')
+  }
+}
+
 
 emitRes('sendLoginUpdate', (myCookie ? true : false))
 
@@ -399,5 +424,6 @@ onMounted(async () => {
   console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin)
   isLoading.value = false
   await buildCalendar();
+  await checkSurvey();
 })
 </script>

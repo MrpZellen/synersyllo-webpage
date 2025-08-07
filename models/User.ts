@@ -18,7 +18,8 @@ const userSchema = new Schema({
       optedIn: { type: Boolean, default: false },
       GID: { type: Schema.Types.ObjectId, ref: 'Group' }
     }],
-    groupPerms: { type: Schema.Types.Mixed, default: null } // adjust if structure known
+    groupPerms: { type: Schema.Types.Mixed, default: null }, // adjust if structure known
+    availableSurvey: { type: Boolean, default: false, required: true }
   },
   settings: {
     timezone: { type: String, default: 'EST' },

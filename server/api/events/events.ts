@@ -34,8 +34,8 @@ export default defineEventHandler(async (event) => {
         }
       });
     });
-    console.log('recieved date ', response.data.items)
-    console.log(userTZ, ' TIMEZONE')
+    //console.log('recieved date ', response.data.items)
+    //console.log(userTZ, ' TIMEZONE')
   const events = response.data.items || [];
     return {
       events: events,

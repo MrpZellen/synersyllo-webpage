@@ -1,6 +1,10 @@
 <template>
-  <div class="flex content-center min-w-full min-h-full">
+  <div v-if="surveyReady && isLoaded" class="flex content-center min-w-full min-h-full">
     <SurveyComponent :model="survey" />
+  </div>
+  <div v-if="!surveyReady && isLoaded" class="items-center justify-center flex flex-col min-w-full min-h-full">
+    <div class="p-5 text-red-500 font-bold text-3xl">YOU CAN'T ACCESS THIS SURVEY YET!</div>
+    <div class="text-red-500 font-italics text-lg">Wait for next Friday at 5:00 PM (UTC)!</div>
   </div>
 </template>
 
@@ -11,6 +15,19 @@ import { generateRandomID } from '~/server/utils/stringGenerator';
 import { useRoute } from 'vue-router';
 import { industryDropdownChoices } from '~/models/choices';
 import 'survey-core/survey-core.css';
+import type { UserType } from '~/models/UserType';
+import type { GroupType } from '~/models/GroupInterface';
+
+
+type usergroupType = {
+  optedIn: boolean,
+  GID: string
+}
+
+const surveyReady = ref(false)
+const isLoaded = ref(false)
+let userSurveyData: UserType;
+const userSpecifics = ref({})
 
 const surveyModel = {
   title: "Employee Feedback Survey",
@@ -171,13 +188,7 @@ const surveyModel = {
       name: "Company & Group Specifics",
       title: "Company & Group Specifics",
       description: "Note: Serious matters or concerns should be brought up to management or HR.",
-      elements: [
-        {
-          type: "html",
-          name: "company_specific_placeholder",
-          html: "<i>This page is loaded dynamically based on company data. It will be populated from the API.</i>"
-        }
-      ]
+      elements: userSpecifics
     }
   ]
 };
@@ -203,19 +214,10 @@ const SURVEY_ID = 1
 
 const companyReturn = async (results: any) => { 
   console.log('we go')
-  navigateTo(`/api/calendar/${username}`)
+  navigateTo(`/calendar/${username}`)
 }
 
-const defineSurveySchema = (survey: any) => {
-  var avoidItem, companyItem = []
-  if(survey.data.bobInfo_specifications_avoid){
-    avoidItem = survey.data.bobInfo_specifications_avoid.split(',');
-  }
-  if(survey.data.companyRoles){
-    companyItem = survey.data.companyRoles.split(',');
-    companyItem.append('admin')
-    companyItem.append('user')
-  }
+const defineSurveySchema = async (survey: any) => {
   console.log(survey.data)
   const structuredOutput = {
     schedulingMeetups: {
@@ -245,12 +247,140 @@ const defineSurveySchema = (survey: any) => {
       helpSeekingFrequency: survey.data.help_seeking_frequency,
       worklifeNotes: survey.data.worklife_notes
     },
-    companySpecific: {
-    }
+    companySpecific: userSpecifics
   };
+  const sentToFast = await $fetch(`/api/sendToBob`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      data: structuredOutput,
+      user: username
+    })
+  })
+  console.log(sentToFast)
   console.log('survey sent!')
   return structuredOutput
 }
+
+const checkSurvey = async () => {
+  try{
+    const response = await $fetch<{ status: number, info: UserType }>('/api/accessUser/getUserByUsername', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username
+      })
+    })
+    if(response.status == 200){
+      surveyReady.value = response.info.employeeData.availableSurvey
+      userSurveyData = response.info
+      console.log('surveyValue: ', surveyReady.value)
+    }
+  }catch(error){
+    console.error('FAILED TO RETRIEVE SURVEY STATUS', error)
+    navigateTo('/logout')
+  }
+}
+
+const generateNewSurveyReplies = async () => {
+  try{
+    let johnArray = userSurveyData.employeeData.groups!
+    let myGroups: usergroupType[] = [];
+    let extraGroups = false
+    johnArray.forEach(element => {
+      if(element.optedIn === true){
+        myGroups.concat({
+          optedIn: true,
+          GID: element.GID
+        })
+        extraGroups = true
+      }
+    });
+    if(extraGroups){
+      console.log('we have extra group data')
+      var surveyAdditions: GroupType[] = await surveyReplyRetrieval(extraGroups)
+      if(surveyAdditions){
+        let constructorUserSpef: any[] = []
+        let itemsTotal = 0
+        console.log('survey stuff exists: ', surveyAdditions)
+        surveyAdditions.forEach(element => {
+          if(element.surveyAdditions){
+            element.surveyAdditions.forEach(addition => {
+              let addItem: any;
+              if(addition.qType === 'slider'){
+                addItem = {
+                  "type": 'rating',
+                  "name": 'customField' + (itemsTotal++),
+                  "title": addition.question!,           //NOT VERY OOP-Y OF ME, BUT I NEED TO DO IT TO HAVEIT FIT THE CONTEXT OF THE OBJECT. 0, 1, 2, and 3 are magic numbers. I will define what they are where they are set too.
+                  "rateMin": addition.responses![0],
+                  "rateMax": addition.responses![1],
+                  "rateMinDescription": addition.responses![2],
+                  "rateMaxDescription": addition.responses![3]
+                }
+              } else if (addition.qType === 'choice'){
+                addItem = {
+                  "type": 'dropdown',
+                  "name": 'customField' + (itemsTotal++),
+                  "title": addition.question!,
+                  "choices": addition.responses!.concat("other")
+                }
+              } else if (addition.qType === 'multiplechoice') {
+                addItem = {
+                  "type": 'multiplevalues',
+                  "name": 'customField' + (itemsTotal++),
+                  "title": addition.question!,
+                  "choices": addition.responses!.concat("other")
+                }
+              } else { //WE ARE NULL, text input
+                addItem = {
+                  "type": 'text',
+                  "name": 'customField' + (itemsTotal++),
+                  "title": addition.question!,
+                  "inputType": 'text',
+                  "placeholder": 'answer here....'
+                }
+              }
+            });
+          }
+        });
+      }
+    }
+  }catch(error){
+    console.error(error)
+  }
+}
+
+const surveyReplyRetrieval = async (groups: usergroupType[]) => {
+  var result: GroupType[] = [];
+  groups.forEach(async element => {
+      const res = await $fetch<{group: GroupType, status: number}>(`/api/groups/getOneGroup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+          GID: element.GID,
+          admin: userSurveyData.userInfo.username,
+          isAdmin: false
+        })
+      })
+      if(res.status === 400){
+        console.error('error retrieving group!!!')
+      }
+      //now we have the groups, use em
+      result.concat(res.group)
+  });
+  return result
+}
+
+onMounted(async () => {
+  await checkSurvey()
+  //NOW WE HAVE USER DATA, ACCESS RELEVANT DATA
+  await generateNewSurveyReplies()
+  isLoaded.value = true
+})
 </script>
 
 <style>

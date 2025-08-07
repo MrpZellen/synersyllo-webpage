@@ -4,22 +4,23 @@ import mongoose from "mongoose";
 
 export default defineEventHandler(async (event) => {
   let req = await readBody(event)
-  //GET USER and PASS from authstate
-  console.log('got user: ', req.username)
+  console.log('survey completed for: ', req.username)
   try {
     console.log('made it past connection')
-    const result = await User.findOne({ 'userInfo.username': req.username }).lean() //lean guarantees we return a javascript object
-    console.log('user found: ', result)
-    if(!result){
-      console.log('our user doesnt exist')
+    const foundUser = await User.updateOne({ 'userInfo.username': req.username }, {
+      $set: {'employeeData.availableSurvey': false }
+    })
+    console.log('set survey completed ')
+    if (!foundUser) {
+      console.log('failed To Update User!')
       return {
         info: null,
         status: 400,
-        code: 'no user by that name',
+        code: 'failed ot update'
       }
-    } else {
+    }else {
       return {
-        info: JSON.parse(JSON.stringify(result)),
+        info: JSON.parse(JSON.stringify(foundUser)),
         status: 200,
         code: 'user found!',
       }
