@@ -1,6 +1,7 @@
 import connectDB from "~/server/utils/db";
 import { ObjectId } from "mongodb";
 import Group from "~/models/Group";
+import User from "~/models/User";
 
 export default defineEventHandler(async (event) => {
   let req = await readBody(event)
@@ -15,8 +16,10 @@ export default defineEventHandler(async (event) => {
         groups: null
       }
     }
-    console.log('getting companyID')
-    const result = await Group.find({ CID: req.CID })
+    const adminRes = await User.findOne({ 'userInfo.username': req.admin })
+    const id  = adminRes!._id
+    console.log('getting companyID. found admin ', id)
+    const result = await Group.find({ members: id })
     console.log('groups found', result);
     if(result === null){
       console.error('NO groups yet?')

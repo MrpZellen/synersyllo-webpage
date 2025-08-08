@@ -208,6 +208,18 @@ let userList = ref<string[]>([])
 const openEditMenu = ref(false)
 
 const editGroup = async () => {
+  const resultOfLeadUser = await $fetch<{info: any}>('/api/accessUser/getUserByUsername', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: editVars.groupLead
+    })
+  })
+  if(resultOfLeadUser){
+    editVars.groupLead = resultOfLeadUser.info.userInfo._id
+  }
   const result = await $fetch<{info: any, status: number, code: string}>('/api/groups/editGroups', {
     method: 'POST',
     headers: {

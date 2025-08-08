@@ -1,5 +1,5 @@
 <template>
-  <div v-if="surveyReady && isLoaded" class="flex content-center min-w-full min-h-full">
+  <div v-if="survey && surveyReady && isLoaded" class="flex content-center min-w-full min-h-full">
     <SurveyComponent :model="survey" />
   </div>
   <div v-if="!surveyReady && isLoaded" class="items-center justify-center flex flex-col min-w-full min-h-full">
@@ -28,7 +28,7 @@ const totalItemCount = ref(0)
 const surveyReady = ref(false)
 const isLoaded = ref(false)
 let userSurveyData: UserType;
-const userSpecifics = ref({})
+const userSpecifics = ref<any[]>([])
 
 const surveyModel = {
   title: "Employee Feedback Survey",
@@ -189,7 +189,7 @@ const surveyModel = {
       name: "Company & Group Specifics",
       title: "Company & Group Specifics",
       description: "Note: Serious matters or concerns should be brought up to management or HR.",
-      elements: userSpecifics
+      elements: userSpecifics ?? []
     }
   ]
 };
@@ -208,8 +208,7 @@ const surveyComplete = (survey: any) => {
 const router = useRoute()
 const username = router.params.user
 
-const survey = new Model(surveyModel)
-survey.onComplete.add(surveyComplete)
+const survey = ref<Model | null>(null)
 //NOW WE MOVE THE DATA:
 const SURVEY_ID = 1 
 
@@ -224,6 +223,7 @@ const defineSurveySchema = async (survey: any) => {
   for(var i = totalItemCount.value; i > 0; i--){
     structureSpecifics[`customItem${i}`] = survey.data[`customField${i}`];
   }
+  console.log(structureSpecifics)
   const structuredOutput = {
     schedulingMeetups: {
       schedulingRating: survey.data.scheduling_rating,
@@ -281,7 +281,7 @@ const checkSurvey = async () => {
     if(response.status == 200){
       surveyReady.value = response.info.employeeData.availableSurvey
       userSurveyData = response.info
-      console.log('surveyValue: ', surveyReady.value)
+      console.log('surveyValue: ', surveyReady.value, response.info)
     }
   }catch(error){
     console.error('FAILED TO RETRIEVE SURVEY STATUS', error)
@@ -293,25 +293,20 @@ const generateNewSurveyReplies = async () => {
   let itemsTotal = 0
   try{
     let johnArray = userSurveyData.employeeData.groups!
-    let myGroups: usergroupType[] = [];
     let extraGroups = false
-    johnArray.forEach(element => {
-      if(element.optedIn === true){
-        myGroups.concat({
-          optedIn: true,
-          GID: element.GID
-        })
-        extraGroups = true
-      }
-    });
+    if(johnArray.length > 0){
+      extraGroups = true
+    }
+    console.log('isgrouped: ', extraGroups, 'isJohn: ', johnArray)
     if(extraGroups){
       console.log('we have extra group data')
-      var surveyAdditions: GroupType[] = await surveyReplyRetrieval(extraGroups)
+      var surveyAdditions: GroupType[] = await surveyReplyRetrieval(johnArray)
       if(surveyAdditions){
         let constructorUserSpef: any[] = []
         console.log('survey stuff exists: ', surveyAdditions)
         surveyAdditions.forEach(element => {
           if(element.surveyAdditions){
+            console.log('OUR ADDITIONS: ', element.surveyAdditions)
             element.surveyAdditions.forEach(addition => {
               let addItem: any;
               if(addition.qType === 'slider'){
@@ -329,14 +324,14 @@ const generateNewSurveyReplies = async () => {
                   "type": 'dropdown',
                   "name": 'customField' + (itemsTotal++),
                   "title": addition.question!,
-                  "choices": addition.responses!.concat("other")
+                  "choices": addition.responses!
                 }
               } else if (addition.qType === 'multiplechoice') {
                 addItem = {
                   "type": 'multiplevalues',
                   "name": 'customField' + (itemsTotal++),
                   "title": addition.question!,
-                  "choices": addition.responses!.concat("other")
+                  "choices": addition.responses!.push("other")
                 }
               } else { //WE ARE NULL, text input
                 addItem = {
@@ -347,13 +342,12 @@ const generateNewSurveyReplies = async () => {
                   "placeholder": 'answer here....'
                 }
               }
-              constructorUserSpef.concat(addItem)
+              console.log(addItem)
+              constructorUserSpef.push(addItem)
             });
           }
         });
         userSpecifics.value = constructorUserSpef
-      } else { //we have no survey additions
-        userSpecifics.value = []
       }
     }
     return itemsTotal
@@ -363,33 +357,35 @@ const generateNewSurveyReplies = async () => {
   }
 }
 
-const surveyReplyRetrieval = async (groups: usergroupType[]) => {
-  var result: GroupType[] = [];
-  groups.forEach(async element => {
-      const res = await $fetch<{group: GroupType, status: number}>(`/api/groups/getOneGroup`, {
+const surveyReplyRetrieval = async (groups: GroupType[]) => {
+  const results = await Promise.all(
+    groups.map(element =>
+      $fetch<{ group: GroupType; status: number }>(`/api/groups/getOneGroup`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }, 
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          GID: element.GID,
+          GID: element,
           admin: userSurveyData.userInfo.username,
           isAdmin: false
         })
       })
-      if(res.status === 400){
-        console.error('error retrieving group!!!')
-      }
-      //now we have the groups, use em
-      result.concat(res.group)
-  });
-  return result
-}
+    )
+  );
+
+  return results
+    .filter(res => res.status !== 400)
+    .map(res => res.group);
+};
 
 onMounted(async () => {
   await checkSurvey()
   //NOW WE HAVE USER DATA, ACCESS RELEVANT DATA
   totalItemCount.value = await generateNewSurveyReplies()
+  surveyModel.pages[2].elements = toRaw(userSpecifics.value) ?? []
+  console.log(surveyModel)
+
+  survey.value = new Model(surveyModel)
+  survey.value.onComplete.add(surveyComplete)
   isLoaded.value = true
 })
 </script>

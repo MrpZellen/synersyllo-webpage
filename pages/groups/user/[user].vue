@@ -13,7 +13,7 @@
     <div class="text-center p-7 font-bold text-4xl">{{ user }}'s groups:</div>
     <div v-if="groupStorage" class="m-5 grid grid-cols-4 row-auto gap-4">
       <div v-for="(group) in groups">
-        <group-item class="p-5" :isAdmin="false" :adminOfPage="String(user)" :groupID="group.GID" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
+        <group-item class="p-5" :current-survey-items="group.surveyAdditions" :isAdmin="false" :adminOfPage="String(user)" :groupID="group.GID" :title="group.name" :members="group.members" :lead="group.groupLead?.toString()" :permittedRoles="group.permittedRoles ?? ['all']" :groupStatus="group.GroupStatus!"/>
       </div>
     </div>
   </div>

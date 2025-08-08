@@ -12,7 +12,7 @@
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="!isLoggedIn" @click="logIn">Login</div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn" @click="logOut">Logout</div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="!isLoggedIn" @click="register">Register</div>
-        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isAdmin && cid" @click="groups">Manage Company Groups</div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isAdmin === true" @click="groups">Manage Company Groups</div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn && cid" @click="userGroups">View Your Groups</div>
         <div v-if="isLoggedIn" class="flex flex-end m-3" @click="userSettings"><img class="rounded-full border-5 border-transparent transition delay-50 duration-200 ease-in-out hover:scale-110 hover:border-blue-300 w-15 h-15" :src="photo" /></div>
       </div>
@@ -76,7 +76,7 @@ onMounted(async () => {
   username.value = res.username
   photo.value = res.photo
   cid.value = String(res.cid)
-  console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin, 'is cid', res.cid, 'is photo', res.photo)
+  console.log('CHECKiNGLOGPROG', 'is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin, 'is cid', res.cid, 'is photo', res.photo)
   isLoading.value = false
 })
 </script>

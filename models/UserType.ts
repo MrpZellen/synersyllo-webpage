@@ -11,10 +11,7 @@ export interface UserType {
   employeeData: {
     isAdmin?: boolean;
     role: string;
-    groups?: {
-      optedIn?: boolean;
-      GID: string; // assumed ObjectId as string
-    }[];
+    groups?: [];
     groupPerms?: any; // ideally replace 'any' with actual structure if known
     availableSurvey: boolean;
   };

@@ -1,6 +1,7 @@
 import connectDB from "~/server/utils/db";
 import { ObjectId } from "mongodb";
 import Group from "~/models/Group";
+import User from "~/models/User";
 
 export default defineEventHandler(async (event) => {
   let req = await readBody(event)
@@ -26,6 +27,15 @@ export default defineEventHandler(async (event) => {
       }
     }
     const result = await Group.insertOne(req.newGroup)
+    await User.findByIdAndUpdate(result.groupLead, {
+      'employeeData.groups': {$push: req.GID }
+    })
+    result.members.forEach(member => {
+      const added = User.findByIdAndUpdate(member, {
+        'employeeData.groups': { $push: result.GID }
+      })
+      console.log(added)
+    });
     console.log('groups found', result);
     if(!result){
       console.error('NO groups yet?')

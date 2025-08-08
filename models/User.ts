@@ -14,10 +14,7 @@ const userSchema = new Schema({
   employeeData: {
     isAdmin: { type: Boolean, default: false },
     role: { type: String, required: true },
-    groups: [{
-      optedIn: { type: Boolean, default: false },
-      GID: { type: Schema.Types.ObjectId, ref: 'Group' }
-    }],
+    groups: {type: [String], default: []},
     groupPerms: { type: Schema.Types.Mixed, default: null }, // adjust if structure known
     availableSurvey: { type: Boolean, default: false, required: true }
   },

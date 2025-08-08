@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     } else {
       res1 = false
     }
-    if(adminCookie){
+    if(JSON.parse(adminCookie!).isAdmin){
       res2 = true
     } else {
       res2 = false

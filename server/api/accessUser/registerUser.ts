@@ -37,7 +37,6 @@ export default defineEventHandler(async (event): Promise<any> => {
     } else {
       finalRole = 'admin'
     }
-    await User.deleteOne({ "userInfo.username": "zellency" });
     console.log('made it past connection')
     const insertedUser = new User({
       userInfo: {
@@ -45,7 +44,7 @@ export default defineEventHandler(async (event): Promise<any> => {
         username: finalUsername,
         password: hashPass,
         email: user.email,
-        fName: user.userDeets.name,
+        fName: user.userDeets.name.split(' ')[0],
         lName: user.userDeets.lastName,
         profilePhoto: user.userDeets.photo
       },
@@ -71,6 +70,13 @@ export default defineEventHandler(async (event): Promise<any> => {
     }
     console.log('user inserted')
     //now we clear state variable
+    setCookie(event, 'userloggedin', JSON.stringify(insertedUser!), {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 3, //3 days
+      })
     killUser(req.authState)
     killPass(req.authState)
     killCID(req.authState)
