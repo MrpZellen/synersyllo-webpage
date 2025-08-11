@@ -19,10 +19,6 @@ import type { UserType } from '~/models/UserType';
 import type { GroupType } from '~/models/GroupInterface';
 
 
-type usergroupType = {
-  optedIn: boolean,
-  GID: string
-}
 
 const totalItemCount = ref(0)
 const surveyReady = ref(false)
@@ -193,29 +189,62 @@ const surveyModel = {
     }
   ]
 };
-const surveyComplete = (survey: any) => {
+const surveyComplete = async (survey: any) => {
   console.log('hi, we did surveys')
-  const companyID = 'COM-' + generateRandomID(9)
-  console.log('generatedNum')
-  survey.setValue("companyID", companyID);
-  console.log('value set')
-  const results = defineSurveySchema(survey)
+  const results = await defineSurveySchema(survey)
   console.log('schema defined')
-
-  //call api to save company scheme
-  companyReturn(JSON.parse(JSON.stringify(results)))
+  //Now we need to send our data to the database
+  const sentResult = await $fetch('/api/survey/postResults', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: {
+      survRes: results,
+      CID: await getCID()
+    }
+  })
+  if(sentResult.status !== 400){
+    console.log('results sent!!!')
+    await sendToCal();
+  }
 }
 const router = useRoute()
 const username = router.params.user
 
-const survey = ref<Model | null>(null)
-//NOW WE MOVE THE DATA:
-const SURVEY_ID = 1 
-
-const companyReturn = async (results: any) => { 
-  console.log('we go')
-  navigateTo(`/calendar/${username}`)
+const getCID = async () => {
+  const result = await $fetch<{ info: UserType, status: number }>(`/api/accessUser/getUserByUsername`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: {
+      username: username
+    }
+  })
+  if(result.status !== 400){
+    return result.info.userInfo.CID
+  } else {
+    return null
+  }
 }
+
+const sendToCal = async () => {
+  const result = await $fetch<{ info: UserType, status: number }>(`/api/accessUser/surveyCompleted`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: {
+      username: username
+    }
+  })
+  if(result.status !== 400){
+  navigateTo(`/calendar/${username}`)
+  }
+}
+
+const survey = ref<Model | null>(null)
 
 const defineSurveySchema = async (survey: any) => {
   console.log(survey.data)
@@ -254,16 +283,6 @@ const defineSurveySchema = async (survey: any) => {
     },
     companySpecific: structureSpecifics
   };
-  const sentToFast = await $fetch(`/api/sendToBob`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      data: structuredOutput,
-      user: username
-    })
-  })
-  console.log(sentToFast)
-  console.log('survey sent!')
   return structuredOutput
 }
 
