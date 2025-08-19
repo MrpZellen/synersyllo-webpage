@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
     }
   setHeaders(event, headers)
   try {
-    console.log('Attempting to send to FastAPI at http://busyapi:80/busybob');
-    resp = await $fetch(`http://busyapi:80/busybob`, {
+    console.log('Attempting to send to FastAPI at http://busyapi:80/');
+    resp = await $fetch(`http://busyapi:80/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

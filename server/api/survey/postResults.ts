@@ -15,18 +15,7 @@ export default defineEventHandler(async (event) => {
     }
     //in line schema define to set collection
     const surveyResult = {
-    schedulingMeetups: {
-    schedulingRating: req.survRes.schedulingRating,
-    unnecessaryScheduleItems: req.survRes.unnecessaryScheduleItems,
-    scheduleAdditions: req.survRes.scheduleAdditions,
-    workloadFairness: req.survRes.workloadFairness,
-    assistanceAvailability: req.survRes.assistanceAvailability,
-    managerAccessibility: req.survRes.managerAccessibility,
-    checkinComfort: req.survRes.checkinComfort,
-    schedulingNeedsMet: req.survRes.schedulingNeedsMet,
-    ptoRespected: req.survRes.ptoRespected,
-    notesOnScheduling: req.survRes.notesOnScheduling,
-  },
+    schedulingMeetups: req.survRes.schedulingMeetups,
     workLifeBalance: req.survRes.workLifeBalance,
     companySpecific: req.survRes.companySpecific,
   }
@@ -38,7 +27,8 @@ export default defineEventHandler(async (event) => {
       },
       body: {
         data: surveyResult,
-        user: req.user
+        user: req.user,
+        coll: collName
       }
     })
   return {
