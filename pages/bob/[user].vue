@@ -201,7 +201,8 @@ const surveyComplete = async (survey: any) => {
     },
     body: {
       survRes: results,
-      CID: await getCID()
+      CID: await getCID(),
+      user: username
     }
   })
   if(sentResult.status !== 400){

@@ -1,8 +1,4 @@
-import connectDB from "~/server/utils/db";
-import User from "~/models/User";
 import mongoose, { mongo, Schema } from "mongoose";
-import SurveyRes from "~/models/SurveyRes";
-import { reseller } from "googleapis/build/src/apis/reseller";
 
 export default defineEventHandler(async (event) => {
   let req = await readBody(event)
@@ -18,31 +14,35 @@ export default defineEventHandler(async (event) => {
       mongoose.connection.db?.createCollection(collName)
     }
     //in line schema define to set collection
-    const surveyResSchema = new Schema({
+    const surveyResult = {
     schedulingMeetups: {
-    schedulingRating: { type: Schema.Types.Mixed },
-    unnecessaryScheduleItems: { type: Schema.Types.Mixed },
-    scheduleAdditions: { type: Schema.Types.Mixed },
-    workloadFairness: { type: Schema.Types.Mixed },
-    assistanceAvailability: { type: Schema.Types.Mixed },
-    managerAccessibility: { type: Schema.Types.Mixed },
-    checkinComfort: { type: Schema.Types.Mixed },
-    schedulingNeedsMet: { type: Schema.Types.Mixed },
-    ptoRespected: { type: Schema.Types.Mixed },
-    notesOnScheduling: { type: Schema.Types.Mixed },
+    schedulingRating: req.survRes.schedulingRating,
+    unnecessaryScheduleItems: req.survRes.unnecessaryScheduleItems,
+    scheduleAdditions: req.survRes.scheduleAdditions,
+    workloadFairness: req.survRes.workloadFairness,
+    assistanceAvailability: req.survRes.assistanceAvailability,
+    managerAccessibility: req.survRes.managerAccessibility,
+    checkinComfort: req.survRes.checkinComfort,
+    schedulingNeedsMet: req.survRes.schedulingNeedsMet,
+    ptoRespected: req.survRes.ptoRespected,
+    notesOnScheduling: req.survRes.notesOnScheduling,
   },
-    workLifeBalance: { type: Schema.Types.Mixed },
-    companySpecific: { type: Schema.Types.Mixed },
-  }, {
-    collection: collName, //sets the company specific collection name
-  });
-  console.log('SurvRes content:', JSON.stringify(req.survRes))
-  const SurveyRes = surveyDB.model('SurveyRes', surveyResSchema);
-  const result = new SurveyRes(req.survRes)
-  const savedResult = await result.save()
-  console.log(savedResult)
+    workLifeBalance: req.survRes.workLifeBalance,
+    companySpecific: req.survRes.companySpecific,
+  }
+  //hand off to my BOB
+  const result = await $fetch('/api/sendToBob', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        data: surveyResult,
+        user: req.user
+      }
+    })
   return {
-    info: savedResult,
+    info: result,
     status: 200,
     code: 'sent back data'
   }

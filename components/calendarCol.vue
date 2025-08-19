@@ -5,7 +5,10 @@
   </div>
     <div class="flex-1 relative items-stretch justify-items-stretch">
       <div v-for="(event, index) in eventList" :key="index">
-        <calendar-event @open-menu="handleChildData" :hours-shown="24" :event-title="event.title" :id="event.id" :event-desc="event.desc" :event-count="dayCount" :hour="event.hour" :chunk="event.chunk"></calendar-event>
+        <calendar-event :class="eventLoaded ? 'opacity-100' : 'opacity-0'" class="opacity-0 transition-opacity duration-500 ease-in" 
+        v-if="eventLoaded" @open-menu="handleChildData" 
+        :hours-shown="24" :event-title="event.title" :id="event.id" :event-desc="event.desc" :event-count="dayCount" :hour="event.hour" :chunk="event.chunk"
+        :style="{ transitionDelay: `${index * 150}ms` }"></calendar-event>
       </div>
     </div>
   </div>
@@ -15,6 +18,7 @@
 import type { CalendarEvent } from '~/models/CalendarEvent';
 
  const emitResult = defineEmits(['sendToBack'])
+ const eventLoaded = ref(false)
  const props = defineProps<{
   recall: boolean
   day: Date,
@@ -22,6 +26,12 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
   calendarTZ: string,
   dayString: string
  }>();
+
+ watch(() => props.day, async () => {
+  eventList.value = []
+  await getEventInfo()
+})
+
  console.log('MY DAY IS ' + props.day)
 const recall = ref(props.recall)
 
@@ -142,6 +152,7 @@ console.log(props.calendarTZ, 'MYTZ')
 };
  onMounted(() => {
     getEventInfo()
+    eventLoaded.value = true;
 })
 </script>
 

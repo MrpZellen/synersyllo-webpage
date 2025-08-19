@@ -26,7 +26,8 @@
     calendarPref: string,
     pageCount: number
   }>();
-  const currentpage = ref(props.pageCount);
+
+  const currentpage = computed(() => props.pageCount);
   const gimmeSunday = (notSunday: Date) => {
   //first, find sunday
   for(var i = notSunday.getDay(); i > 0; i--){

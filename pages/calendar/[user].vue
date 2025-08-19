@@ -133,7 +133,7 @@
         :theme-color="items.themeColor"
         :user-email="items.userEmail"
         :days-per-week="7"
-        :page-count="pageIndicator"
+        :page-count="page"
       />
       </div>
       </div>
@@ -164,11 +164,11 @@ import { getData, setData } from 'nuxt-storage/local-storage';
 //get user
 const route = useRoute()
 var username = ref(route.params.user)
-
+const page = ref(0)
+const resultsGained = ref(false)
 const isAdmin = ref(false)
 const isLoading = ref(true)
 const changeTimezone = ref(false)
-const pageIndicator = ref(getData(String(username)) ?? 0)
 const leftButtonShown = ref(false)
 const rightButtonShown = ref(false)
 
@@ -178,8 +178,14 @@ const menuClosed = ref(true)
 const checkValues = z.object({
   eventTitle: z.string(),
   eventDesc: z.string(),
-  startHour: z.string(),
-  endHour: z.string(),
+  startHour: z.date(),
+  endHour: z.date(),
+}).refine((data) => {
+  const timeRes = ((new Date(data.startHour).getTime()) - (new Date(data.endHour).getTime())) / 6000 //gives time i am looking for 30 min or more
+  return timeRes >= 15
+
+}, {
+  message: 'event must be 15 minutes or longer!'
 })
 var goodFields = ref(true)
 var openAddWindow = ref(false);
@@ -204,10 +210,7 @@ const pageUp = async (isUp: boolean) => {
   } else {
     await setData(String(username), (res - 1))
   }
-  reloadNuxtApp({
-    ttl: 100,
-    force: true,
-  })
+  page.value = await getData(String(username))
 }
 //NEW CONCEPT: a reactive allows it to be changed post build
 const items = reactive({
@@ -306,6 +309,7 @@ const buildCalendar = async () => {
     items.daysPerWeek = 7;
     items.hoursTotal = 24 + 1;
     console.log('ITEMS HERE!!!!  ', result)
+    resultsGained.value = true
   })
 };
 
@@ -423,7 +427,10 @@ onMounted(async () => {
   isAdmin.value = res.isAdmin
   console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin)
   isLoading.value = false
+  page.value = await getData(String(username))
+  if(!resultsGained.value){
   await buildCalendar();
+  }
   await checkSurvey();
 })
 </script>
