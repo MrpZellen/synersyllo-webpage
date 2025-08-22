@@ -19,7 +19,10 @@ export default defineEventHandler(async (event) => {
     const adminRes = await User.findOne({ 'userInfo.username': req.admin })
     const id  = adminRes!._id
     console.log('getting companyID. found admin ', id)
-    const result = await Group.find({ members: id })
+    const result = await Group.find({ $or: [
+    { members: id },
+    { groupLead: id }
+  ]})
     console.log('groups found', result);
     if(result === null){
       console.error('NO groups yet?')

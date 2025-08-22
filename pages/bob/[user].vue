@@ -27,6 +27,9 @@ let userSurveyData: UserType;
 const userSpecifics = ref<any[]>([])
 
 const surveyModel = {
+  completedHTMLOnCondition:{ 
+    expression: "True",
+    html: { default: "thank you for completing the survey! \nPlease wait as we process your results..."}},
   title: "Employee Feedback Survey",
   showProgressBar: "top",
   pages: [

@@ -236,8 +236,8 @@ const popOutValues = ref<{
   eventID: string,
   eventTitle: string,
   eventDesc: string,
-  startHour: number,
-  endHour: number,
+  startHour: 0,
+  endHour:0,
   isRecurring: boolean,
   timezone: string
 }>({
@@ -333,6 +333,7 @@ const backNew = () => {
 
 //ADD EVENT
 const addEvent = async () => {
+  console.log('we addin')
   try{
   checkValues.parse({
     eventTitle: popOutValues.value.eventTitle,
@@ -345,6 +346,7 @@ const addEvent = async () => {
       repetitionValues.value.endsOn = 'never'
     }
   }
+  console.log(popOutValues.value)
   //then post it:
   const response = await $fetch('/api/events/addEvent', {
     method: 'POST',

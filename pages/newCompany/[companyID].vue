@@ -55,7 +55,7 @@ const submitRegistration = async () => {
     const id = uuidv4()
 
     //ALONG WITH ALL OTHER USUAL REGISTRATION SETS, WE SET AN ISADMIN TO TRUE
-    const admin = await $fetch(`/api/adminstatus/${id}`, {
+    const admin = await $fetch(`/api/statusManagement/adminstatus/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -66,7 +66,7 @@ const submitRegistration = async () => {
     })
   })
 
-    const user = await $fetch(`/api/session/${id}`, {
+    const user = await $fetch(`/api/statusManagement/session/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ const submitRegistration = async () => {
       state: id
     })
   })
-  const pass = await $fetch(`/api/passstatus/${id}`, {
+  const pass = await $fetch(`/api/statusManagement/passstatus/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -87,7 +87,7 @@ const submitRegistration = async () => {
     })
   })
   //now we set registration status
-  const isRegistered = await $fetch(`/api/registerstatus/${id}`, {
+  const isRegistered = await $fetch(`/api/statusManagement/registerstatus/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ const submitRegistration = async () => {
     })
   })
    //now we set the CURRENT CID
-  const CID = await $fetch(`/api/cidstatus/${id}`, {
+  const CID = await $fetch(`/api/statusManagement/cidstatus/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
