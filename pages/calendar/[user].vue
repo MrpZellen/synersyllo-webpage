@@ -178,10 +178,11 @@ const menuClosed = ref(true)
 const checkValues = z.object({
   eventTitle: z.string(),
   eventDesc: z.string(),
-  startHour: z.date(),
-  endHour: z.date(),
+  startHour: z.string(),
+  endHour: z.string(),
 }).refine((data) => {
-  const timeRes = ((new Date(data.startHour).getTime()) - (new Date(data.endHour).getTime())) / 6000 //gives time i am looking for 30 min or more
+  const timeRes = ((new Date(data.endHour).getTime()) - (new Date(data.startHour).getTime())) / 6000 //gives time i am looking for 30 min or more
+  console.log('timeRes: ', timeRes, new Date(data.startHour).getTime(), new Date(data.endHour).getTime())
   return timeRes >= 15
 
 }, {

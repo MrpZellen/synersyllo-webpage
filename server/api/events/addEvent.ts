@@ -51,11 +51,11 @@ export default defineEventHandler(async (event) => {
               summary: req.eventTitle,
               start: {
                 dateTime: new Date(req.startHour).toISOString(),
-                timeZone: req.timezone,
+                timeZone: req.timezone ? req.timezone : 'America/Denver',
               },
               end: {
                 dateTime: new Date(req.endHour).toISOString(),
-                timeZone: req.timezone,
+                timeZone: req.timezone ? req.timezone : 'America/Denver',
               },
               transparency: req?.transparency ?? 'opaque',
               status: req.status ?? 'tentative'

@@ -12,7 +12,8 @@ export default defineEventHandler(async (event) => {
       status: 400
       } 
   }
-  var userTZ = userSettings.timezonePref
+  var userTZ = userSettings.timezonePreference
+  console.log('USER TIMEZONE: ', userTZ)
   const oauthClient = new google.auth.OAuth2(config.OAUTHID, config.OAUTHSECRET, config.REDIRECT)
   const tokens = JSON.parse(cookie);
   oauthClient.setCredentials(tokens);
