@@ -123,7 +123,7 @@
           </div>
         </div>
      </div>
-        <calendar-back class="relative z-20"
+        <calendar-back v-if="items.calendarPref != ''" class="relative z-20"
         @emit-final="retrieveBackData"
         :calendar-pref="items.calendarPref"
         :hours-total="items.hoursTotal"
@@ -132,7 +132,7 @@
         :title-of-calendar="items.titleOfCalendar"
         :theme-color="items.themeColor"
         :user-email="items.userEmail"
-        :days-per-week="7"
+        :days-per-week="items.daysPerWeek"
         :page-count="page"
       />
       </div>
@@ -307,7 +307,7 @@ const buildCalendar = async () => {
     items.userEmail = result.calendars.id;
     items.calendarPref = result.calendars.timeZone;
     console.log('TIMEZONE FROM SOURCE: ', items.calendarPref )
-    items.daysPerWeek = 7;
+    items.daysPerWeek = 5;
     items.hoursTotal = 24 + 1;
     console.log('ITEMS HERE!!!!  ', result)
     resultsGained.value = true
@@ -429,11 +429,11 @@ onMounted(async () => {
   const res = await $fetch<{ isLoggedIn: boolean, isAdmin: boolean }>('/api/checkLoginStatus')
   isAdmin.value = res.isAdmin
   console.log('is logged in: ', res.isLoggedIn, 'Is admin: ', res.isAdmin)
-  isLoading.value = false
   page.value = await getData(String(username))
   if(!resultsGained.value){
   await buildCalendar();
   }
   await checkSurvey();
+  isLoading.value = false
 })
 </script>

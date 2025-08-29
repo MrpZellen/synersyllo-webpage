@@ -27,6 +27,9 @@ import type { CalendarEvent } from '~/models/CalendarEvent';
   dayString: string
  }>();
 
+
+ console.log('CAL PROP', props.calendarTZ)
+
  watch(() => props.day, async () => {
   eventList.value = []
   await getEventInfo()
@@ -104,6 +107,7 @@ const recall = ref(props.recall)
 
 console.log(props.calendarTZ, 'MYTZ')
   eventInfo.forEach(element => {
+    if(element.start.dateTime && element.end.dateTime){
      var dateString = element.start.dateTime.substring(0, 10);
      var same = sameDay(new Date(dateString), props.day)
      //console.log('date test', date)
@@ -138,7 +142,8 @@ console.log(props.calendarTZ, 'MYTZ')
       }
       eventList.value.push(newItem)
      }
-  });
+    }
+    });
     }
     console.log('EVENTS ON ' + props.day, eventList.value)
  }

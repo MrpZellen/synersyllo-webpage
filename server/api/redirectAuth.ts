@@ -62,12 +62,22 @@ export default defineEventHandler(async (event) => {
           userStuff: userStuff,
           authState: state
         })
-        }).then((data) => {
+        }).then(async (data) => {
           if(data){
             console.log('success')
             username = data.userData
             adminStatus= data.adminStatus
             successfulBountifulFortuneOfWorking = true
+            const result = await $fetch('/api/accessUser/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              authState: state,
+              email: userStuff.email
+            })
+          })
           } else {
             console.error('failed to fetch result, submit failed!')
             sendRedirect(event, `/register`)

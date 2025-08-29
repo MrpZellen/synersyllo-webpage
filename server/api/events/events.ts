@@ -1,4 +1,5 @@
 import {google} from 'googleapis'
+import { toZonedTime, format } from 'date-fns-tz';
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -12,8 +13,7 @@ export default defineEventHandler(async (event) => {
       status: 400
       } 
   }
-  var userTZ = userSettings.timezonePreference
-  console.log('USER TIMEZONE: ', userTZ)
+  var userTZ = userSettings.timezonePref
   const oauthClient = new google.auth.OAuth2(config.OAUTHID, config.OAUTHSECRET, config.REDIRECT)
   const tokens = JSON.parse(cookie);
   oauthClient.setCredentials(tokens);
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
         calendarId:'primary',
         maxResults:100,
         singleEvents:true,
-        timeZone: userTZ!,
+        timeZone: userTZ,
         orderBy:'startTime',
       }, (err: any, res: any) => {
         if (err) {
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
       });
     });
     //console.log('recieved date ', response.data.items)
-    //console.log(userTZ, ' TIMEZONE')
+    console.log(userTZ, ' TIMEZONE')
   const events = response.data.items || [];
     return {
       events: events,

@@ -1,13 +1,13 @@
 <template>
   <div v-if="!props.isInBG" class="flex w-full min-h-dvh justify-center w-100 border-2 border-black bg-transparent">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :day-string="calculateDay(day+1).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(day)" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :day-string="calculateDay(day+1).toString().substring(0, 10)" :calendar-t-z="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(day)" :key="index" :recall="props.recall"/>
     </div>
   </div>
   <div v-else class="flex w-full min-h-dvh justify-center w-100 border-2 border-black bg-transparent">
     <div class="flex w-full min-h-dvh justify-center w-100 border-2 border-black blur-xs">
     <div class="grid grid-cols-{{ daysPerWeek }} gap-4 w-full min-h-full" v-for="(day, index) in dayCounted">
-      <calendar-col @send-to-back="retrieveBackData" :dayString="calculateDay(day+1).toString().substring(0, 10)" :calendarTZ="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(day)" :key="index" :recall="props.recall"/>
+      <calendar-col @send-to-back="retrieveBackData" :dayString="calculateDay(day+1).toString().substring(0, 10)" :calendar-t-z="calendarPref" :day-count="daysPerWeek" class="h-full" :day="calculateDay(day)" :key="index" :recall="props.recall"/>
     </div>
   </div>
   </div>
@@ -26,6 +26,7 @@
     calendarPref: string,
     pageCount: number
   }>();
+  console.log('CHECKPROPTZ', props.calendarPref)
 
   const currentpage = computed(() => props.pageCount);
   const gimmeSunday = (notSunday: Date) => {
@@ -47,11 +48,11 @@
     const result = new Date(sunday)
     if(currentpage.value >= 0){
       for(var i = (currentpage.value); i > 0; i--){
-        result.setDate(result.getDate() + props.daysPerWeek)
+        result.setDate(result.getDate() + 7)
       }
     } else {
       for(var i = (currentpage.value); i < 0; i++){
-        result.setDate(result.getDate() - props.daysPerWeek)
+        result.setDate(result.getDate() - 7)
       }
     }
     //now we have set it to the sunday of the proper week
@@ -68,8 +69,10 @@
   }
 
   var dayCounted: number[] = []
-  if(props.daysPerWeek == 5){
-    dayCounted = [1, 2, 3, 4, 5]
+  if(props.daysPerWeek <= 5){
+    for(var i = 0; i < props.daysPerWeek; i++){
+      dayCounted.push(i)
+    }
   } else {
     dayCounted = [0, 1, 2, 3, 4, 5, 6]
   }

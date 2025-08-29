@@ -10,10 +10,10 @@
         <img src="/Logo.ico" class="w-15 h-15" /> <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold text-lg font-bold">SynerSyllo</div> <span class="text-lg" v-if="isAdmin"> - Admin Signin</span> </div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn" @click="myCalendar">My Calendar</div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="!isLoggedIn" @click="logIn">Login</div>
-        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn" @click="logOut">Logout</div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="!isLoggedIn" @click="register">Register</div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isAdmin === true" @click="groups">Manage Company Groups</div>
         <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn && cid" @click="userGroups">View Your Groups</div>
+        <div class="transition delay-50 duration-200 ease-in-out hover:scale-130 hover:text-synsyl-lightblue font-bold" v-if="isLoggedIn" @click="logOut">Logout</div>
         <div v-if="isLoggedIn" class="flex flex-end m-3" @click="userSettings"><img class="rounded-full border-5 border-transparent transition delay-50 duration-200 ease-in-out hover:scale-110 hover:border-blue-300 w-15 h-15" :src="photo" /></div>
       </div>
     </header>
