@@ -17,6 +17,7 @@ import { industryDropdownChoices } from '~/models/choices';
 import 'survey-core/survey-core.css';
 import type { UserType } from '~/models/UserType';
 import type { GroupType } from '~/models/GroupInterface';
+import { calendar } from 'googleapis/build/src/apis/calendar';
 
 
 
@@ -197,6 +198,15 @@ const surveyComplete = async (survey: any) => {
   const results = await defineSurveySchema(survey)
   console.log('schema defined')
   //Now we need to send our data to the database
+  var calendarData = await $fetch('/api/events/eventInterval', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: {
+      username: username
+    }
+  });
   const sentResult = await $fetch('/api/survey/postResults', {
     method: 'POST',
     headers: {
@@ -204,6 +214,7 @@ const surveyComplete = async (survey: any) => {
     },
     body: {
       survRes: results,
+      calDetails: calendarData,
       CID: await getCID(),
       user: username
     }

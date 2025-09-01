@@ -81,7 +81,7 @@ const recall = ref(props.recall)
  //handling event API info
   var eventInfo: CalendarEvent[];
   const getEventInfo = async () => {
-    const result = await $fetch<{ events: CalendarEvent[] }>('/api/events/events', {
+    const result = await $fetch<{ events: CalendarEvent[] }>('/api/events/eventInterval', {
       credentials: 'include',
       method: 'POST',
       headers: {
@@ -90,7 +90,8 @@ const recall = ref(props.recall)
       body: JSON.stringify({
         userSettings: {
           timezonePref: props.calendarTZ
-        }
+        },
+        day: props.day
       })
     })
     console.log('OUR RESULT:', result)

@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
       },
       body: {
         data: surveyResult,
+        calendarDetails: req.calDetails,
         user: req.user,
         coll: collName
       }
