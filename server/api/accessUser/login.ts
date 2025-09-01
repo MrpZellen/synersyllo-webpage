@@ -69,6 +69,7 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error) {
     console.log('WHATWENTWRONG', error)
+    deleteCookie(event, 'google_tokens')
       return {
         info: null,
         status: 400,

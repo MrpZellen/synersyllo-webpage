@@ -17,9 +17,9 @@ export default defineEventHandler(async (event) => {
   }
   const oauthClient = new google.auth.OAuth2(process.env.OAUTHID, process.env.OAUTHSECRET, process.env.REDIRECT)
   const url = oauthClient.generateAuthUrl({
-    prompt: 'consent',
+    prompt: 'select_account consent',
     access_type:'offline',
-    include_granted_scopes: false,
+    include_granted_scopes: true,
     scope:[ 'https://www.googleapis.com/auth/calendar',
       'https://www.googleapis.com/auth/contacts.readonly',
      ],

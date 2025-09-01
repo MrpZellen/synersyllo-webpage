@@ -143,6 +143,10 @@ export default defineEventHandler(async (event) => {
     }
 
   } catch (error) {
+    oauthClient.revokeCredentials()
+    console.error('Error during authentication process:', error);
+    deleteCookie(event, 'google_tokens')
+    deleteCookie(event, 'adminacc')
     sendRedirect(event, `/login?floppedLogin=true`)
     return error
   }

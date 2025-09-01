@@ -45,7 +45,6 @@ const loginInfo = ref<{
 
 const submitLogin = async () => {
   try {
-    console.log(loginInfo.value.password, loginInfo.value.username)
     failedPass.value = false
     failedUser.value = false
     const id = uuidv4()
