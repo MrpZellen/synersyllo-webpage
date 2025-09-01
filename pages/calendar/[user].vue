@@ -434,6 +434,7 @@ onMounted(async () => {
   await buildCalendar();
   }
   await checkSurvey();
+  
   isLoading.value = false
 })
 </script>
