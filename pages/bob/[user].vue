@@ -11,13 +11,10 @@
 <script lang="ts" setup>
 import { SurveyComponent } from 'survey-vue3-ui';
 import { Model } from 'survey-core';
-import { generateRandomID } from '~/server/utils/stringGenerator';
 import { useRoute } from 'vue-router';
-import { industryDropdownChoices } from '~/models/choices';
 import 'survey-core/survey-core.css';
 import type { UserType } from '~/models/UserType';
 import type { GroupType } from '~/models/GroupInterface';
-import { calendar } from 'googleapis/build/src/apis/calendar';
 
 
 

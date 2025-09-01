@@ -16,7 +16,10 @@ export default defineEventHandler(async (event) => {
       status: 400
       } 
   }
-  var userTZ = userSettings.timezonePref
+  var userTZ = userSettings ? userSettings.timezonePref : Intl.DateTimeFormat().resolvedOptions().timeZone
+  if(!userTZ || userTZ === 'undefined'){
+    userTZ = 'America/Denver'
+  }
   const oauthClient = new google.auth.OAuth2(config.OAUTHID, config.OAUTHSECRET, config.REDIRECT)
   const tokens = JSON.parse(cookie);
   oauthClient.setCredentials(tokens);
