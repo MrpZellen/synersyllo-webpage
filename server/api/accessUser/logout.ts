@@ -3,7 +3,10 @@ import { google } from 'googleapis'
 export default defineEventHandler(async (event) => {
   try {
     const oauthClient = new google.auth.OAuth2(process.env.OAUTHID, process.env.OAUTHSECRET, process.env.REDIRECT)
+    console.log(oauthClient.getAccessToken())
+    if (oauthClient.getAccessToken() != null){
     await oauthClient.revokeCredentials()
+    }
     deleteCookie(event, 'google_tokens')
     deleteCookie(event, 'adminacc')
     return {

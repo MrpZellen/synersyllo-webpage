@@ -389,7 +389,7 @@ const removeEvent = async () => {
     },
     body: JSON.stringify({
       eventID: popOutValues.value.eventID,
-      calendarID: 'work@benleonard.net' //todo: get user info from mongodb
+      calendarID: items.userEmail
     })
   }).then(() => {
     console.log(response)

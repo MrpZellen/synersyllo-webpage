@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const cookie = getCookie(event, 'google_tokens');
   const req = await readBody(event)
-  console.log('hit and req')
+  console.log('hit and req', req)
   if (!cookie){
     console.log('no cookie data')
     return {
